@@ -128,19 +128,11 @@ window.BS = (function () {
       document.addEventListener('click', () => um.classList.remove('open'));
       $('#logout-btn').onclick = async () => { await DB.auth.signOut(); toast('Вы вышли из аккаунта'); location.href = 'index.html'; };
     }
-    demoBanner(h);
   }
   function renderSimpleHeader() {
     const h = $('#site-header'); if (!h) return;
     h.className = 'header simple';
     h.innerHTML = `<div class="container"><a class="logo" href="index.html"><i></i>BEAUTY STUDIO</a><a class="back" href="index.html">‹ На главную</a></div>`;
-    demoBanner(h);
-  }
-  function demoBanner(h) {
-    if (DB.mode !== 'demo') return;
-    const b = document.createElement('div'); b.className = 'demo-banner';
-    b.innerHTML = 'Демо‑режим: данные хранятся в этом браузере. Мастер: anna@example.com / 123456 · админ: admin@beauty.studio / admin123';
-    h.parentNode.insertBefore(b, h);
   }
   function renderFooter(settings) {
     const f = $('#site-footer'); if (!f) return; const c = settings.contacts;

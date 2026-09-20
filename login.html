@@ -53,7 +53,7 @@
   $('#forgot').onclick = async () => {
     const email = $('#email').value.trim();
     if (!/^\S+@\S+\.\S+$/.test(email)) { setErr($('#email').closest('.field'), 'Введите email, на который отправить ссылку'); return; }
-    try { const r = await DB.auth.resetPassword(email); showMsg($('#msg'), r && r.demo ? 'В демо‑режиме восстановление недоступно. Пароль мастера: 123456' : 'Ссылка для сброса пароля отправлена на ' + email, 'ok'); }
+    try { await DB.auth.resetPassword(email); showMsg($('#msg'), 'Ссылка для сброса пароля отправлена на ' + email, 'ok'); }
     catch (err) { showMsg($('#msg'), err.message); }
   };
 })();

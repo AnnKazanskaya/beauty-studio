@@ -372,7 +372,6 @@ body.has-bookbar { padding-bottom: 100px; }
 .footer .container { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--ink-3); }
 .footer .links { display: flex; gap: 20px; flex-wrap: wrap; }
 .footer .links a:hover { color: var(--ink); }
-.demo-banner { background: var(--pink-soft); color: var(--pink-dark); font-size: 13px; text-align: center; padding: 8px 16px; }
 
 /* ===== ADMIN ===== */
 .admin { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; background: #fbfbfb; }
@@ -388,8 +387,9 @@ body.has-bookbar { padding-bottom: 100px; }
 .sidebar .spacer { flex: 1; }
 .sidebar .who { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.05); border-radius: 18px; padding: 14px; }
 .sidebar .who .avatar { background: var(--pink); border-color: var(--pink); color: var(--ink); }
-.sidebar .who b { display: block; font-size: 14px; font-weight: 500; }
-.sidebar .who span { font-size: 11px; color: #a0a0a0; display: block; }
+.sidebar .who .meta { min-width: 0; }
+.sidebar .who .meta b { display: block; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar .who .meta span { font-size: 11px; color: #a0a0a0; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sidebar .who button { margin-left: auto; border: 0; background: none; color: #a0a0a0; font-size: 18px; padding: 4px; }
 .sidebar .who button:hover { color: #fff; }
 .admin-main { padding: 40px 48px 80px; min-width: 0; }

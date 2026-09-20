@@ -1,7 +1,7 @@
 /* Общий каркас админ‑панели */
 window.ADMIN = (function () {
   const { $, $$, esc } = BS;
-  const NAV = [['index.html', 'Дашборд', '◉'], ['schedule.html', 'Расписание', '▦'], ['masters.html', 'Мастера', '‹'], ['settings.html', 'Настройки', '✦']];
+  const NAV = [['index.html', 'Дашборд', '◉'], ['schedule.html', 'Расписание', '▦'], ['masters.html', 'Мастера', '◐'], ['settings.html', 'Настройки', '✦']];
 
   async function init() {
     let user = null, settings = DB.DEFAULT_SETTINGS;
@@ -11,12 +11,11 @@ window.ADMIN = (function () {
     const links = NAV.map(([h, t, i]) => `<a href="${h}" class="nav-item ${cur === h ? 'active' : ''}"><span class="ic">${i}</span>${t}</a>`).join('');
     $('#sidebar').innerHTML = `<div class="brand"><a class="logo" href="../index.html"><i></i><span>BEAUTY<br>STUDIO</span></a><span class="badge tag">Admin</span></div>${links}
       <div class="spacer"></div><a href="../index.html" class="nav-item"><span class="ic">‹</span>На сайт</a>
-      <div class="who"><span class="avatar sm">${esc((user.name || 'A')[0].toUpperCase())}</span><div><b>Администратор</b><span>${esc(user.email)}</span></div><button id="adm-logout" title="Выйти" aria-label="Выйти">⏻</button></div>`;
+      <div class="who"><span class="avatar sm">${esc((user.name || 'A')[0].toUpperCase())}</span><div class="meta"><b>${esc(user.name || 'Администратор')}</b><span>${esc(user.email)}</span></div><button id="adm-logout" title="Выйти" aria-label="Выйти">⏻</button></div>`;
     $('#adm-logout').onclick = async () => { await DB.auth.signOut(); location.href = '../index.html'; };
     const tb = $('#topbar');
     if (tb) { tb.innerHTML = `<span class="logo" style="color:#fff;font-size:16px"><i></i>BEAUTY STUDIO <span class="badge tag" style="margin-left:8px">Admin</span></span><button class="burger" id="sb-toggle" aria-label="Меню"><span></span><span></span><span></span></button>`;
       $('#sb-toggle').onclick = () => $('#sidebar').classList.toggle('open'); }
-    if (DB.mode === 'demo') { const b = document.createElement('div'); b.className = 'demo-banner'; b.style.borderRadius = '14px'; b.style.marginBottom = '20px'; b.textContent = 'Демо‑режим: изменения сохраняются только в этом браузере.'; $('.admin-main').prepend(b); }
     return { user, settings };
   }
 

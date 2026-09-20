@@ -30,7 +30,7 @@
         <div class="card"><h3 class="mb-3">Быстрые действия</h3>
           <div class="grid" style="gap:10px">
             <a class="qa-item" href="schedule.html"><span class="icon-sq">▦</span><div><b>Управлять расписанием</b><span>Закрыть слоты или дни</span></div><span class="chev">›</span></a>
-            <a class="qa-item" href="masters.html"><span class="icon-sq">‹</span><div><b>Список мастеров</b><span id="qa-masters">мастера зарегистрированы</span></div><span class="chev">›</span></a>
+            <a class="qa-item" href="masters.html"><span class="icon-sq">◐</span><div><b>Список мастеров</b><span id="qa-masters">мастера зарегистрированы</span></div><span class="chev">›</span></a>
             <a class="qa-item" href="settings.html"><span class="icon-sq">✦</span><div><b>Настройки</b><span>Часы работы, цены, шаблоны писем</span></div><span class="chev">›</span></a>
             <button class="qa-item" id="qa-toggle-booking"><span class="icon-sq">●</span><div><b id="qa-toggle-t">…</b><span>Временная пауза приёма броней</span></div><span class="chev">›</span></button>
           </div></div>
@@ -66,7 +66,7 @@
       <div class="card metric dark"><div class="k"><i>◉</i> Записей сегодня</div><div class="num">${cnt(t, t)}</div><div class="sub">из ${totalToday} слотов <span class="badge green" style="padding:2px 10px;font-size:11px">${totalToday ? Math.round(cnt(t, t) / totalToday * 100) : 0}% заполнено</span></div></div>
       <div class="card metric"><div class="k"><i>▦</i> На неделе</div><div class="num">${wk}</div><div class="sub">${trend(pct(wk, wkPrev))} к прошлой неделе</div></div>
       <div class="card metric"><div class="k"><i>✦</i> На месяц</div><div class="num">${mo}</div><div class="sub">${trend(pct(mo, moPrev))} к прошлому месяцу</div></div>
-      <div class="card metric"><div class="k"><i>‹</i> Мастеров</div><div class="num">${masters.length}</div><div class="sub">${newWeek} новых за неделю</div></div>`;
+      <div class="card metric"><div class="k"><i>◐</i> Мастеров</div><div class="num">${masters.length}</div><div class="sub">${newWeek} новых за неделю</div></div>`;
     $('#qa-masters').textContent = `${plural(masters.length, 'мастер зарегистрирован', 'мастера зарегистрированы', 'мастеров зарегистрированы')}`;
 
     const up = active.filter((b) => b.date >= t && b.date <= addDays(t, 1)).sort((a, b) => (a.date + BS.pad(a.hour)).localeCompare(b.date + BS.pad(b.hour)));

@@ -15,12 +15,7 @@
 | `prices.html` — цены | | `settings.html` — настройки |
 | `contacts.html` — контакты | | |
 
-## Режимы работы
-
-- **Демо** (по умолчанию, ключи в `js/config.js` пустые): все данные живут в браузере. Логины: мастер `anna@example.com / 123456`, админ `admin@beauty.studio / admin123`.
-- **Боевой**: заполнены `SUPABASE_URL` и `SUPABASE_ANON_KEY` — аккаунты, брони и настройки хранятся в Supabase.
-
-## Запуск боевой версии
+## Подключение Supabase (уже сделано для проекта beauty-studio)
 
 1. **Supabase.** На supabase.com создай проект. В *SQL Editor* вставь весь файл `supabase/schema.sql` и нажми Run.
 2. **Ключи.** *Project Settings → API*: скопируй Project URL и anon/publishable key в `js/config.js`.

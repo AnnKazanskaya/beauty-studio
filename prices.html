@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Цены — Beauty Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -15,57 +13,59 @@
 <body>
 <header id="site-header"></header>
 
-<div class="container">
-  <div class="page-head">
-    <div><div class="eyebrow">Прайс‑лист</div><h1 style="font-size:clamp(30px,5vw,52px)">Цены на аренду места</h1><p>Три тарифа на любой график: от разовой пары часов до постоянной работы в студии.</p></div>
-    <a class="btn pink" href="booking.html">Забронировать</a>
+<section class="section">
+  <div class="container">
+    <div class="section-head"><div class="eyebrow">Тарифы</div><h1 style="font-size:clamp(36px,5vw,64px)">Простые и <span class="ac">прозрачные</span> цены</h1><p class="lead">Без скрытых платежей, без обязательных абонементов. Платите только за то, чем пользуетесь.</p></div>
+    <div class="grid grid-3" id="tariffs"></div>
   </div>
+</section>
 
-  <div class="grid grid-3" id="tariffs"></div>
-
-  <div class="card dark mt-4" style="padding:36px">
-    <div class="two" style="align-items:center">
-      <div><div class="eyebrow" style="color:#a9a9a9">Оплата</div><h2>Платите на месте</h2><p class="muted mt-2">Бронь на сайте бесплатна и ничего не списывает. Оплату принимает администратор перед началом работы.</p></div>
-      <div class="grid grid-3" style="gap:10px">
-        <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);padding:18px"><b>Наличные</b><p class="muted small mt-1">Точная сумма по тарифу</p></div>
-        <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);padding:18px"><b>Карта</b><p class="muted small mt-1">Любая банковская карта</p></div>
-        <div class="card" style="background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);padding:18px"><b>СБП</b><p class="muted small mt-1">По QR‑коду без комиссии</p></div>
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="card dark" style="padding:64px 48px">
+      <div class="two" style="align-items:center;gap:48px">
+        <div><h2 style="font-size:clamp(28px,3.4vw,44px)">Оплата на месте — <span class="ac">удобно</span></h2><p class="muted mt-3">Никаких онлайн‑платежей, комиссий и предоплат. Бронируете онлайн, приходите и оплачиваете удобным для вас способом прямо в салоне.</p></div>
+        <div class="grid" style="gap:14px">
+          <div class="pay-item"><span class="icon-circle pinkfill">₽</span><div><b>Наличные</b><span>Принимаем наличные в любой сумме</span></div></div>
+          <div class="pay-item"><span class="icon-circle pinkfill">◆</span><div><b>Банковская карта</b><span>Visa, Mastercard, МИР через терминал</span></div></div>
+          <div class="pay-item"><span class="icon-circle pinkfill">✦</span><div><b>Перевод по СБП</b><span>Быстрый перевод по номеру телефона</span></div></div>
+        </div>
       </div>
     </div>
   </div>
+</section>
 
-  <section class="section">
-    <div class="eyebrow">FAQ</div>
-    <h2 class="mb-3">Частые вопросы</h2>
-    <div class="faq" id="faq">
-      <details open><summary>Что входит в рабочее место?</summary><p>Кресло, рабочий стол, зеркало с подсветкой, стерилизатор, розетки, доступ к воде и зоне ожидания для клиентов. Косметика, расходники и инструменты — ваши.</p></details>
-      <details><summary>Как считается тариф «день»?</summary><p>Если вы выбираете все рабочие часы одного дня за одним местом, система автоматически применяет тариф «день» — это дешевле почасовой оплаты.</p></details>
-      <details><summary>Можно ли отменить бронь?</summary><p id="faq-cancel">Да, в личном кабинете. Бесплатная отмена доступна за 12 часов до начала слота и более. Позже отмена недоступна — бронь считается использованной.</p></details>
-      <details><summary>Как оформить абонемент?</summary><p>Абонемент оформляется у администратора студии при первом визите: вы оплачиваете пакет часов, затем бронируете как обычно, а часы списываются с пакета.</p></details>
-      <details><summary>Нужна ли предоплата?</summary><p>Нет. Бронь на сайте бесплатна, оплата — на месте перед началом работы наличными, картой или через СБП.</p></details>
+<section class="section" style="padding-top:0">
+  <div class="container narrow">
+    <div class="section-head"><h2>Частые <span class="ac">вопросы</span></h2></div>
+    <div class="faq">
+      <details><summary>Можно ли отменить бронь?</summary><p id="faq-cancel"></p></details>
+      <details><summary>Сколько слотов можно забронировать сразу?</summary><p id="faq-max"></p></details>
+      <details><summary>Что входит в стоимость аренды?</summary><p>Рабочее место с креслом, зеркалом с подсветкой, стерилизатором, розетками, доступ к воде и зоне ожидания для клиентов. Косметика, расходники и инструменты — ваши.</p></details>
+      <details><summary>Есть ли скидки для постоянных мастеров?</summary><p>Да. Тариф «день» уже выгоднее почасового, а абонемент даёт лучшую цену за час и приоритет в бронировании. Абонемент оформляется у администратора.</p></details>
+      <details><summary>Нужна ли предоплата?</summary><p>Нет. Бронь на сайте бесплатна и ничего не списывает. Оплата — на месте перед началом работы наличными, картой или через СБП.</p></details>
     </div>
-  </section>
-
-  <div class="card soft" style="text-align:center;padding:48px 24px">
-    <h2>Готовы забронировать?</h2>
-    <p class="muted mt-2">Календарь свободных слотов открыт на месяц вперёд.</p>
-    <a class="btn pink mt-3" href="booking.html">Выбрать время</a>
   </div>
-</div>
+</section>
 
 <footer id="site-footer"></footer>
 <script>
 (async () => {
   const ctx = await BS.init(); if (!ctx) return;
-  const { settings } = ctx; const p = settings.prices; const { $, money } = BS;
-  $('#faq-cancel').textContent = `Да, в личном кабинете. Бесплатная отмена доступна за ${settings.rules.cancelHours} часов до начала слота и более. Позже отмена недоступна — бронь считается использованной.`;
+  const { settings } = ctx; const p = settings.prices; const { $, money } = BS; const n = (v) => money(v).replace(' ₽', '');
+  const hrs = BS.dayHours(settings).length; const save = Math.max(0, Math.round((1 - p.day / (p.hour * hrs)) * 100));
+  $('#faq-cancel').textContent = `Да, в личном кабинете в разделе «Мои записи». Бесплатная отмена доступна за ${settings.rules.cancelHours} часов до начала слота и более. Позже отмена недоступна — бронь считается использованной.`;
+  $('#faq-max').textContent = `До ${settings.rules.maxSlotsPerBooking} слотов за одну бронь: можно выбрать несколько часов подряд, разные места и даже разные дни. Итог посчитается внизу страницы бронирования.`;
   $('#tariffs').innerHTML = `
-    <div class="card"><div class="eyebrow">Час</div><div class="price">${money(p.hour)}<small> / час</small></div>
-      <ul class="list mt-3"><li>Любое количество часов</li><li>Можно выбрать часы вразбивку</li><li>Одно или несколько мест</li><li>Оплата на месте</li></ul></div>
-    <div class="card" style="border-color:var(--pink);box-shadow:0 0 0 1px var(--pink)"><div class="row between"><div class="eyebrow">День</div><span class="badge pink">Выгодно</span></div><div class="price">${money(p.day)}<small> / день</small></div>
-      <ul class="list mt-3"><li>Все рабочие часы дня</li><li>Экономия ${money(Math.max(0, p.hour * 10 - p.day))} по сравнению с почасовой</li><li>Применяется автоматически</li><li>Место закреплено за вами</li></ul></div>
-    <div class="card"><div class="eyebrow">Абонемент</div><div class="price">${money(p.subscription)}<small> / ${p.subscriptionHours} часов</small></div>
-      <ul class="list mt-3"><li>${money(Math.round(p.subscription / p.subscriptionHours))} за час</li><li>Действует 30 дней</li><li>Оформляется у администратора</li><li>Часы списываются при бронировании</li></ul></div>`;
+    <div class="price-card"><div class="k">Час</div><div class="price">${n(p.hour)}<small>₽</small></div><div class="sub">за 1 час аренды</div>
+      <ul class="plist"><li>Любое свободное рабочее место</li><li>Доступ ко всему оборудованию</li><li>Зона ожидания для клиентов</li><li>Бесплатный Wi‑Fi и кофе</li><li>Гибкая отмена за ${settings.rules.cancelHours} часов</li></ul>
+      <a class="btn outline" href="booking.html">Забронировать</a></div>
+    <div class="price-card popular"><span class="badge tag">Популярный</span><div class="k">День</div><div class="price">${n(p.day)}<small>₽</small></div><div class="sub">${hrs} часов работы — выгоднее на ${save}%</div>
+      <ul class="plist"><li>Полный рабочий день (${BS.fmtHour(settings.hours.open)}–${BS.fmtHour(settings.hours.close)})</li><li>Закрепление за конкретным местом</li><li>Доступ ко всему оборудованию</li><li>Зона ожидания для клиентов</li><li>Бесплатный Wi‑Fi и кофе</li><li>Хранение материалов на день</li></ul>
+      <a class="btn pinkfill" href="booking.html">Забронировать</a></div>
+    <div class="price-card"><div class="k">Абонемент</div><div class="price">${n(p.subscription)}<small>₽</small></div><div class="sub">в месяц — лучшая экономия</div>
+      <ul class="plist"><li>До ${p.subscriptionHours} часов работы в месяц</li><li>Приоритет в бронировании</li><li>Гарантия рабочего места</li><li>Постоянное место хранения материалов</li><li>Скидка на дополнительные часы</li><li>Бесплатный Wi‑Fi и кофе</li></ul>
+      <a class="btn outline" href="contacts.html">Оформить у администратора</a></div>`;
 })();
 </script>
 </body>

@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Мастера — Beauty Studio Admin</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/config.js"></script>
@@ -19,52 +17,52 @@
 <div class="admin">
   <aside class="sidebar" id="sidebar"></aside>
   <main class="admin-main">
-    <div class="admin-head"><div><h2>Мастера</h2><p class="muted">Все зарегистрированные мастера студии</p></div></div>
-    <div class="grid grid-3 mb-3" id="mini"></div>
-    <div class="card">
-      <div class="row between mb-2">
-        <div class="search" style="flex:1;min-width:220px;max-width:380px"><input class="input" id="q" placeholder="Поиск по имени, телефону, email"></div>
-        <div class="tabs"><button class="tab active" data-f="all">Все</button><button class="tab" data-f="active">Активные</button><button class="tab" data-f="blocked">Заблокированные</button></div>
-      </div>
-      <div class="table-wrap" id="table">Загрузка…</div>
+    <div class="admin-head"><div class="eyebrow">Управление</div><h1>Мастера <span class="ac">салона</span></h1></div>
+    <div class="grid grid-4 mb-3" id="mini"></div>
+    <div class="row between mb-3">
+      <div class="search"><input class="input" id="q" placeholder="Поиск по имени, телефону или email"></div>
+      <div class="pills"><button class="pill active" data-f="all">Все</button><button class="pill" data-f="active">Активные</button><button class="pill" data-f="blocked">Заблокированные</button></div>
     </div>
+    <div class="card flush"><div class="table-wrap" id="table">Загрузка…</div></div>
   </main>
 </div>
 <script>
 (async () => {
   const ctx = await ADMIN.init(); if (!ctx) return;
-  const { $, $$, esc, toast, fmtDate, today, addDays, money } = BS;
+  const { $, $$, esc, toast, fmtDateNum, today, addDays } = BS;
   let masters = [], bookings = [], filter = 'all', q = '';
   async function load() {
     try { [masters, bookings] = await Promise.all([DB.masters.list(), DB.bookings.all({ from: addDays(today(), -365), to: addDays(today(), 60) })]); } catch (e) { toast(e.message, 'error'); }
-    const active = bookings.filter((b) => b.status === 'active');
+    masters = [...masters].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
     const newMonth = masters.filter((m) => new Date(m.created_at) > Date.now() - 30 * 864e5).length;
-    $('#mini').innerHTML = `<div class="card metric"><div class="k">Всего мастеров</div><div class="num">${masters.length}</div><div class="sub">${newMonth} новых за 30 дней</div></div>
-      <div class="card metric"><div class="k">С бронями впереди</div><div class="num">${new Set(active.filter((b) => b.date >= today()).map((b) => b.user_id)).size}</div><div class="sub">мастеров записаны</div></div>
-      <div class="card metric"><div class="k">Заблокированы</div><div class="num">${masters.filter((m) => m.blocked).length}</div><div class="sub">без доступа к брони</div></div>`;
+    $('#mini').innerHTML = `<div class="card metric" style="padding:24px"><div class="k">Всего мастеров</div><div class="num" style="font-size:28px;margin:12px 0 0">${masters.length}</div></div>
+      <div class="card metric" style="padding:24px"><div class="k">Активных</div><div class="num" style="font-size:28px;margin:12px 0 0">${masters.filter((m) => !m.blocked).length}</div></div>
+      <div class="card metric" style="padding:24px"><div class="k">Заблокированных</div><div class="num" style="font-size:28px;margin:12px 0 0">${masters.filter((m) => m.blocked).length}</div></div>
+      <div class="card metric" style="padding:24px"><div class="k">Новых за месяц</div><div class="num" style="font-size:28px;margin:12px 0 0">${newMonth}</div></div>`;
     render();
   }
   function render() {
     const list = masters.filter((m) => filter === 'all' || (filter === 'blocked') === !!m.blocked)
       .filter((m) => !q || [m.name, m.phone, m.email].some((v) => (v || '').toLowerCase().includes(q)));
     if (!list.length) { $('#table').innerHTML = '<div class="empty">Никого не найдено</div>'; return; }
-    $('#table').innerHTML = `<table><thead><tr><th>Мастер</th><th>Контакты</th><th>Брони</th><th>Сумма</th><th>Статус</th><th></th></tr></thead><tbody>${list.map((m) => {
+    $('#table').innerHTML = `<table><thead><tr><th>Мастер</th><th>Контакты</th><th>Регистрация</th><th>Броней</th><th>Статус</th><th></th></tr></thead><tbody>${list.map((m) => {
       const mine = bookings.filter((b) => b.user_id === m.id && b.status === 'active');
-      const up = mine.filter((b) => b.date >= today()).length;
-      return `<tr><td><div class="row" style="gap:10px"><span class="avatar" style="width:34px;height:34px;font-size:13px;${m.blocked ? 'background:var(--line-2)' : ''}">${esc((m.name || m.email || '?')[0].toUpperCase())}</span><div><b>${esc(m.name || '—')}</b><br><span class="muted small">с ${fmtDate(m.created_at.slice(0, 10))}</span></div></div></td>
+      const idx = masters.indexOf(m) + 1;
+      return `<tr><td><div class="row" style="gap:12px;flex-wrap:nowrap"><span class="avatar sm">${ADMIN.initial(m.name || m.email)}</span><div><b style="font-weight:500">${esc(m.name || '—')}</b><br><span class="muted small">ID #${idx}</span></div></div></td>
         <td class="small"><a href="tel:${esc((m.phone || '').replace(/[^\d+]/g, ''))}">${esc(m.phone || '—')}</a><br><a href="mailto:${esc(m.email)}" class="muted">${esc(m.email)}</a></td>
-        <td><b>${mine.length}</b> <span class="muted small">часов · ${up} впереди</span></td><td>${money(mine.reduce((s, b) => s + (b.price || 0), 0))}</td>
-        <td>${m.blocked ? '<span class="badge red">Заблокирован</span>' : '<span class="badge green"><span class="dot"></span> Активен</span>'}</td>
-        <td>${ADMIN.actionsMenu([{ act: 'mail:' + m.id, label: 'Написать на email' }, m.blocked ? { act: 'unblock:' + m.id, label: 'Разблокировать' } : { act: 'block:' + m.id, label: 'Заблокировать', danger: true }])}</td></tr>`; }).join('')}</tbody></table>`;
+        <td class="muted small">${fmtDateNum(m.created_at.slice(0, 10))}</td><td><b style="font-size:18px">${mine.length}</b></td>
+        <td>${m.blocked ? '<span class="badge red"><span class="dot"></span> Заблокирован</span>' : '<span class="badge green"><span class="dot"></span> Активен</span>'}</td>
+        <td>${ADMIN.actionsMenu([{ act: 'mail:' + m.id, label: 'Написать на email' }, { act: 'sched:' + m.id, label: 'Открыть расписание' }, m.blocked ? { act: 'unblock:' + m.id, label: 'Разблокировать' } : { act: 'block:' + m.id, label: 'Заблокировать', danger: true }])}</td></tr>`; }).join('')}</tbody></table>`;
     ADMIN.bindMenus($('#table'), async (act) => {
       const [a, id] = act.split(':'); const m = masters.find((x) => x.id === id);
       if (a === 'mail') location.href = 'mailto:' + m.email;
+      if (a === 'sched') location.href = 'schedule.html';
       if (a === 'block' && await BS.confirmDlg('Заблокировать мастера?', `${esc(m.name)} не сможет создавать новые брони. Существующие брони останутся.`, { ok: 'Заблокировать', danger: true })) { try { await DB.masters.setBlocked(id, true); toast('Мастер заблокирован'); await load(); } catch (e) { toast(e.message, 'error'); } }
       if (a === 'unblock') { try { await DB.masters.setBlocked(id, false); toast('Доступ восстановлен'); await load(); } catch (e) { toast(e.message, 'error'); } }
     });
   }
   $('#q').addEventListener('input', () => { q = $('#q').value.trim().toLowerCase(); render(); });
-  $$('.tab').forEach((t) => (t.onclick = () => { $$('.tab').forEach((x) => x.classList.remove('active')); t.classList.add('active'); filter = t.dataset.f; render(); }));
+  $$('.pill').forEach((t) => (t.onclick = () => { $$('.pill').forEach((x) => x.classList.remove('active')); t.classList.add('active'); filter = t.dataset.f; render(); }));
   await load();
 })();
 </script>

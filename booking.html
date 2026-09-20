@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Бронирование места — Beauty Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<title>Бронирование — Beauty Studio</title>
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -17,28 +15,19 @@
 
 <div class="container">
   <div class="page-head">
-    <div><div class="eyebrow">Бронирование</div><h1 style="font-size:clamp(30px,5vw,52px)">Выберите дату и часы</h1><p>Можно отметить несколько часов и даже несколько дней — итог посчитается внизу. Оплата на месте.</p></div>
-    <div class="row" id="head-badges"></div>
+    <div><div class="eyebrow">Бронирование</div><h1>Выберите дату <span class="ac">и время</span></h1><p class="lead">Можно выбрать несколько слотов сразу — на разных местах и в разное время. Подтвердите бронь внизу страницы.</p></div>
   </div>
-
   <div id="notice"></div>
-
   <div class="two-wide">
     <div class="cal" id="cal"></div>
     <div class="slots" id="slots"></div>
-  </div>
-
-  <div class="grid grid-3 mt-4">
-    <div class="card soft"><b>1. Выберите слоты</b><p class="muted small mt-1">Нажимайте на свободные ячейки. Повторное нажатие снимает выбор.</p></div>
-    <div class="card soft"><b>2. Подтвердите</b><p class="muted small mt-1">Проверьте список и сумму в окне подтверждения.</p></div>
-    <div class="card soft"><b>3. Приходите</b><p class="muted small mt-1">За 10 минут до начала. Оплата администратору на месте.</p></div>
   </div>
 </div>
 
 <div class="bookbar" id="bookbar">
   <div class="container">
     <div><div class="muted small" id="bar-sub">Выбрано 0 слотов</div><b id="bar-total">0 ₽</b></div>
-    <div class="row"><button class="clr" id="bar-clear">Очистить</button><button class="btn" id="bar-book">Забронировать</button></div>
+    <div class="row"><button class="clr" id="bar-clear">Очистить</button><button class="btn" id="bar-book">Подтвердить бронь ›</button></div>
   </div>
 </div>
 

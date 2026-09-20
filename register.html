@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Регистрация мастера — Beauty Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<title>Регистрация — Beauty Studio</title>
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -15,47 +13,50 @@
 <body>
 <header id="site-header"></header>
 
-<div class="auth-wrap">
-  <div class="card auth-card">
+<div class="auth-bg">
+  <div class="auth-card">
     <div class="eyebrow">Регистрация</div>
-    <h2>Аккаунт мастера</h2>
-    <p class="muted mb-3">Меньше минуты — и можно бронировать место.</p>
+    <h2>Создайте <span class="ac">аккаунт</span></h2>
+    <p class="lead">Заполните данные — это займёт меньше минуты.</p>
     <form class="form" id="reg-form" novalidate>
-      <div class="field"><label for="name">Имя и фамилия</label><input class="input" id="name" autocomplete="name" placeholder="Анна Иванова" required><div class="err"></div></div>
-      <div class="field"><label for="phone">Телефон</label><input class="input" id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__"><div class="err"></div></div>
+      <div class="field"><label for="name">Имя</label><input class="input" id="name" autocomplete="name" placeholder="Например, Анна" required><div class="err"></div></div>
       <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="email" placeholder="you@example.com" required><div class="err"></div></div>
-      <div class="field"><label for="password">Пароль</label><div class="pw-wrap"><input class="input" id="password" type="password" autocomplete="new-password" placeholder="Минимум 6 символов" required><button type="button" class="pw-toggle" aria-label="Показать пароль"></button></div><div class="err"></div></div>
-      <div class="field"><label class="check"><input type="checkbox" id="agree"><span>Согласен(на) на обработку персональных данных и с правилами бронирования</span></label><div class="err"></div></div>
+      <div class="field"><label for="phone">Телефон</label><input class="input" id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 (___) ___-__-__"><div class="err"></div></div>
+      <div class="grid grid-2" style="gap:14px">
+        <div class="field"><label for="password">Пароль</label><div class="pw-wrap"><input class="input" id="password" type="password" autocomplete="new-password" placeholder="Минимум 6" required><button type="button" class="pw-toggle">показать</button></div><div class="err"></div></div>
+        <div class="field"><label for="password2">Повторите</label><div class="pw-wrap"><input class="input" id="password2" type="password" autocomplete="new-password" placeholder="Ещё раз" required><button type="button" class="pw-toggle">показать</button></div><div class="err"></div></div>
+      </div>
+      <div class="field"><label class="check"><input type="checkbox" id="agree"><span>Я согласна на обработку <a href="#">персональных данных</a> и принимаю <a href="#">условия использования</a></span></label><div class="err"></div></div>
       <div class="form-msg" id="msg"></div>
-      <button class="btn pink block" type="submit" id="submit">Создать аккаунт</button>
+      <button class="btn block" type="submit" id="submit">Зарегистрироваться</button>
     </form>
-    <p class="muted small mt-3" style="text-align:center">Уже есть аккаунт? <a href="login.html" class="pink" style="font-weight:700">Войти</a></p>
+    <div class="divider">уже есть аккаунт?</div>
+    <p class="center"><a class="linkbtn ul" href="login.html">Войти в аккаунт ›</a></p>
   </div>
 </div>
 
-<footer id="site-footer"></footer>
 <script>
 (async () => {
-  const ctx = await BS.init({ redirectIfAuthed: true }); if (!ctx) return;
+  const ctx = await BS.init({ redirectIfAuthed: true, simple: true }); if (!ctx) return;
   const { $, setErr, showMsg, busy } = BS;
-  $('.pw-toggle').innerHTML = BS.ICON.eye;
   BS.phoneMask($('#phone'));
   const f = (id) => $('#' + id).closest('.field');
   $('#reg-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const name = $('#name').value.trim(), phone = $('#phone').value.trim(), email = $('#email').value.trim(), pw = $('#password').value;
+    const name = $('#name').value.trim(), phone = $('#phone').value.trim(), email = $('#email').value.trim(), pw = $('#password').value, pw2 = $('#password2').value;
     let ok = true;
     setErr(f('name'), name.length < 2 ? 'Введите имя' : ''); ok &= name.length >= 2;
     setErr(f('phone'), phone && phone.replace(/\D/g, '').length !== 11 ? 'Введите телефон полностью' : ''); ok &= !phone || phone.replace(/\D/g, '').length === 11;
     setErr(f('email'), !/^\S+@\S+\.\S+$/.test(email) ? 'Введите корректный email' : ''); ok &= /^\S+@\S+\.\S+$/.test(email);
-    setErr(f('password'), pw.length < 6 ? 'Пароль не короче 6 символов' : ''); ok &= pw.length >= 6;
+    setErr(f('password'), pw.length < 6 ? 'Не короче 6 символов' : ''); ok &= pw.length >= 6;
+    setErr(f('password2'), pw !== pw2 ? 'Пароли не совпадают' : ''); ok &= pw === pw2;
     setErr(f('agree'), !$('#agree').checked ? 'Нужно согласие' : ''); ok &= $('#agree').checked;
     if (!ok) return;
     busy($('#submit'), true, 'Создаём аккаунт…');
     try {
       const r = await DB.auth.signUp({ email, password: pw, name, phone });
       if (r.needsConfirm) {
-        $('#reg-form').innerHTML = `<div class="card soft" style="text-align:center"><h3>Проверьте почту</h3><p class="muted mt-1">Мы отправили письмо на <b>${BS.esc(email)}</b>. Перейдите по ссылке из письма, чтобы подтвердить аккаунт, затем войдите.</p><a class="btn mt-3" href="login.html">Перейти ко входу</a></div>`;
+        $('#reg-form').innerHTML = `<div class="card soft center"><h3>Проверьте почту</h3><p class="muted mt-1">Мы отправили письмо на <b>${BS.esc(email)}</b>. Перейдите по ссылке из письма, затем войдите.</p><a class="btn mt-3" href="login.html">Перейти ко входу</a></div>`;
       } else { BS.toast('Аккаунт создан. Добро пожаловать!'); location.href = new URLSearchParams(location.search).get('next') || 'booking.html'; }
     } catch (err) { showMsg($('#msg'), err.message); busy($('#submit'), false); }
   });

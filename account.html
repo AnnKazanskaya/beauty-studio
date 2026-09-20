@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Мои записи — Beauty Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -15,10 +13,10 @@
 <body>
 <header id="site-header"></header>
 
-<div class="container">
+<div class="container mid">
   <div class="page-head">
-    <div><div class="eyebrow">Личный кабинет</div><h1 style="font-size:clamp(30px,5vw,52px)">Мои записи</h1><p id="cancel-hint">Отменить бронь можно за 12 часов до начала и более.</p></div>
-    <a class="btn pink" href="booking.html">Новая бронь</a>
+    <div><div class="eyebrow">Личный кабинет</div><h1>Мои <span class="ac">записи</span></h1></div>
+    <a class="btn" href="booking.html">+ Новая бронь</a>
   </div>
   <div class="tabs mb-3">
     <button class="tab active" data-tab="up">Предстоящие <span class="cnt" id="cnt-up">0</span></button>
@@ -31,11 +29,9 @@
 <script>
 (async () => {
   const ctx = await BS.init({ auth: true }); if (!ctx) return;
-  const { settings } = ctx; const { $, $$, esc, fmtDate, fmtDateShort, hoursToRanges, money, toast, canCancel, plural } = BS;
-  $('#cancel-hint').textContent = `Отменить бронь можно за ${settings.rules.cancelHours} часов до начала и более.`;
+  const { settings } = ctx; const { $, $$, esc, hoursToRanges, money, toast, canCancel, plural, seatName } = BS;
   let tab = 'up', bookings = [];
 
-  // Группируем слоты одной даты и места в одну карточку
   function groups(list) {
     const g = {};
     list.forEach((b) => { const k = b.date + '|' + b.seat + '|' + b.status; (g[k] ||= { date: b.date, seat: b.seat, status: b.status, items: [] }).items.push(b); });
@@ -49,18 +45,19 @@
   }
   function render() {
     const all = groups(bookings);
-    const up = all.filter((g) => g.status === 'active' && !isPast(g)).sort((a, b) => (a.date + a.items[0].hour).localeCompare(b.date + b.items[0].hour));
-    const past = all.filter((g) => g.status !== 'active' || isPast(g)).sort((a, b) => (b.date + b.items[0].hour).localeCompare(a.date + a.items[0].hour));
+    const up = all.filter((g) => g.status === 'active' && !isPast(g)).sort((a, b) => (a.date + BS.pad(a.items[0].hour)).localeCompare(b.date + BS.pad(b.items[0].hour)));
+    const past = all.filter((g) => g.status !== 'active' || isPast(g)).sort((a, b) => (b.date + BS.pad(b.items[0].hour)).localeCompare(a.date + BS.pad(a.items[0].hour)));
     $('#cnt-up').textContent = up.length; $('#cnt-past').textContent = past.length;
     const list = tab === 'up' ? up : past;
     if (!list.length) { $('#list').innerHTML = `<div class="empty card"><b>${tab === 'up' ? 'Пока нет предстоящих броней' : 'Прошедших броней нет'}</b>${tab === 'up' ? 'Выберите удобные часы в календаре.' : 'Здесь появится история ваших визитов.'}<div class="mt-3"><a class="btn sm" href="booking.html">Забронировать</a></div></div>`; return; }
     $('#list').innerHTML = list.map((g) => {
       const d = BS.parse(g.date); const cancellable = g.status === 'active' && g.items.every((b) => canCancel(b, settings));
-      const status = g.status === 'cancelled' ? '<span class="badge red">Отменена</span>' : isPast(g) ? '<span class="badge gray">Завершена</span>' : '<span class="badge green"><span class="dot"></span> Подтверждена</span>';
+      const status = g.status === 'cancelled' ? '<span class="badge red"><span class="dot"></span> Отменена</span>' : isPast(g) ? '<span class="badge gray"><span class="dot"></span> Завершена</span>' : '<span class="badge green"><span class="dot"></span> Подтверждена</span>';
       return `<div class="card bk-card ${tab === 'past' ? 'past' : ''}">
-        <div class="bk-date"><b>${d.getDate()}</b><span>${BS.MONTHS[d.getMonth()].slice(0, 3)}</span></div>
-        <div class="bk-info"><b>${hoursToRanges(g.items.map((i) => i.hour))}</b><span class="muted">Место ${g.seat} · ${plural(g.items.length, 'час', 'часа', 'часов')} · ${money(g.sum)} · ${BS.DOW_FULL[BS.dowIdx(g.date)].toLowerCase()}</span></div>
-        <div class="bk-right">${status}${g.status === 'active' && !isPast(g) ? (cancellable ? `<button class="btn light sm" data-cancel="${g.items.map((i) => i.id).join(',')}">Отменить</button>` : `<span class="muted small" title="Отмена доступна за ${settings.rules.cancelHours} ч и более">Отмена недоступна: до начала меньше ${settings.rules.cancelHours} ч</span>`) : ''}</div>
+        <div class="bk-date"><b>${d.getDate()}</b><span class="mo">${BS.MONTHS_SHORT[d.getMonth()]}</span><span class="dw">${BS.DOW_FULL[BS.dowIdx(g.date)]}</span></div>
+        <div class="bk-info"><div class="t">${hoursToRanges(g.items.map((i) => i.hour))} <span class="badge pink"><span class="dot"></span> ${esc(seatName(settings, g.seat))}</span></div>
+          <div class="c">Стоимость: <b>${money(g.sum)}</b> &nbsp; Оплата на месте</div><div>${status}</div></div>
+        <div>${g.status === 'active' && !isPast(g) ? (cancellable ? `<button class="btn outline pink sm" data-cancel="${g.items.map((i) => i.id).join(',')}">Отменить бронь</button>` : `<span class="muted small">Отмена недоступна:<br>до начала меньше ${settings.rules.cancelHours} ч</span>`) : ''}</div>
       </div>`;
     }).join('');
     $$('[data-cancel]').forEach((b) => (b.onclick = async () => {

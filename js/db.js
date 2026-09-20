@@ -4,35 +4,29 @@
    - supabase: настоящая база (аккаунты, брони, админка) */
 (function () {
   const cfg = window.BS_CONFIG || {};
-  const useSupabase = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase);
+  // Для локального просмотра без базы: в консоли localStorage.bs_force_demo = '1'
+  let forceDemo = false; try { forceDemo = localStorage.getItem('bs_force_demo') === '1'; } catch (e) {}
+  const useSupabase = !forceDemo && !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase);
 
   const DEFAULT_SETTINGS = {
-    seats: 2,
-    // 0 = понедельник … 6 = воскресенье
-    schedule: [
-      { open: 10, close: 20, closed: false },
-      { open: 10, close: 20, closed: false },
-      { open: 10, close: 20, closed: false },
-      { open: 10, close: 20, closed: false },
-      { open: 10, close: 20, closed: false },
-      { open: 10, close: 20, closed: false },
-      { open: 11, close: 18, closed: false },
-    ],
-    prices: { hour: 600, day: 4000, subscription: 5000, subscriptionHours: 10 },
+    hours: { open: 10, close: 20 },
+    seatNames: ['У окна', 'У зеркала'],
+    prices: { hour: 500, day: 3500, subscription: 25000, subscriptionHours: 80 },
     rules: { cancelHours: 12, maxDaysAhead: 30, maxSlotsPerBooking: 20 },
     bookingOpen: true,
     contacts: {
       name: 'Beauty Studio',
-      address: 'г. Пермь, ул. Тихоокеанская, 38г',
-      phone: '+7 (342) 000-00-00',
-      email: 'hello@beauty-studio.ru',
-      mapUrl: 'https://yandex.ru/maps/?text=Пермь,%20ул.%20Тихоокеанская,%2038г',
+      address: 'г. Пермь, ул. Тихоокеанская, 38',
+      addressNote: '5 минут от метро • парковка во дворе',
+      phone: '+7 (900) 000-00-00',
+      email: 'hello@beautystudio.ru',
+      mapUrl: 'https://yandex.ru/maps/?text=Пермь,%20ул.%20Тихоокеанская,%2038',
       socials: { instagram: '', telegram: '', vk: '', tiktok: '' },
     },
     emails: {
-      confirm: 'Здравствуйте, {name}! Ваша бронь подтверждена: {date}, {time}, место №{seat}. Оплата на месте. До встречи в Beauty Studio!',
-      cancel: 'Здравствуйте, {name}. Бронь на {date}, {time}, место №{seat} отменена.',
-      reminder: 'Напоминаем: завтра в {time} вас ждёт рабочее место №{seat} в Beauty Studio. Адрес: {address}.',
+      confirm: 'Здравствуйте, {name}! Ваша бронь подтверждена: {date}, {time}, место «{seat}». Оплата на месте. До встречи в Beauty Studio!',
+      cancel: 'Здравствуйте, {name}. Бронь на {date}, {time}, место «{seat}» отменена.',
+      reminder: 'Напоминаем: завтра в {time} вас ждёт рабочее место «{seat}» в Beauty Studio. Адрес: {address}.',
     },
     notify: { newBooking: true, cancel: true, newMaster: true },
   };
@@ -49,7 +43,7 @@
   const nowIso = () => new Date().toISOString();
 
   /* ======================= DEMO (localStorage) ======================= */
-  const KEY = 'beauty_studio_demo_v1';
+  const KEY = 'beauty_studio_demo_v2';
   function demoBackend() {
     let state;
     const load = () => {
@@ -69,7 +63,7 @@
       ];
       const bookings = [];
       const add = (user, date, hours, seat, daysAgo) => hours.forEach((h) => bookings.push({
-        id: uid(), user_id: user, date, hour: h, seat, status: 'active', price: 600,
+        id: uid(), user_id: user, date, hour: h, seat, status: 'active', price: 500,
         created_at: new Date(Date.now() - daysAgo * 864e5).toISOString(), cancelled_at: null,
       }));
       add('u-2', d(0), [12, 13, 14], 1, 3);
@@ -81,7 +75,7 @@
       add('u-2', d(5), [14, 15, 16], 1, 0.1);
       add('u-1', d(-3), [12, 13, 14], 1, 6);
       add('u-1', d(-10), [10, 11], 2, 12);
-      bookings.push({ id: uid(), user_id: 'u-3', date: d(4), hour: 12, seat: 2, status: 'cancelled', price: 600, created_at: new Date(Date.now() - 2 * 864e5).toISOString(), cancelled_at: new Date(Date.now() - 1 * 864e5).toISOString() });
+      bookings.push({ id: uid(), user_id: 'u-3', date: d(4), hour: 12, seat: 2, status: 'cancelled', price: 500, created_at: new Date(Date.now() - 2 * 864e5).toISOString(), cancelled_at: new Date(Date.now() - 1 * 864e5).toISOString() });
       const closed = [{ id: uid(), date: d(2), hour: 18, seat: null, reason: 'Техобслуживание' }];
       return { users, bookings, closed, settings: {}, session: null };
     }

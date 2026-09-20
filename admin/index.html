@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Дашборд — Beauty Studio Admin</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/config.js"></script>
@@ -19,23 +17,22 @@
 <div class="admin">
   <aside class="sidebar" id="sidebar"></aside>
   <main class="admin-main">
-    <div class="admin-head"><div><h2>Дашборд</h2><p class="muted" id="date-line"></p></div>
-      <div class="row"><a class="btn light sm" href="schedule.html">Расписание</a><a class="btn sm" href="../booking.html">Открыть сайт брони</a></div></div>
+    <div class="admin-head"><div class="eyebrow">Админ‑панель</div><h1>Добро пожаловать, <span class="ac" id="adm-name">Анна</span></h1><p class="muted" id="date-line"></p></div>
 
     <div class="grid grid-4 mb-3" id="metrics"></div>
 
-    <div class="two-wide" style="grid-template-columns:1fr 360px">
+    <div class="two-wide" style="grid-template-columns:1.5fr 1fr">
       <div class="card">
-        <div class="row between mb-2"><h3>Ближайшие брони</h3><span class="muted small">сегодня и завтра</span></div>
-        <div class="table-wrap" id="upcoming">Загрузка…</div>
+        <div class="row between"><div><h3>Ближайшие брони</h3><p class="muted small">Сегодня и завтра</p></div><a class="btn outline sm" href="schedule.html">Все ›</a></div>
+        <div class="list-rows mt-2" id="upcoming">Загрузка…</div>
       </div>
       <div class="grid" style="align-content:start">
-        <div class="card"><h3 class="mb-2">Быстрые действия</h3>
-          <div class="grid" style="gap:8px">
-            <button class="btn light sm" id="qa-close-today">Закрыть остаток сегодняшнего дня</button>
-            <a class="btn light sm" href="schedule.html">Закрыть слот или день</a>
-            <a class="btn light sm" href="masters.html">Найти мастера</a>
-            <button class="btn light sm" id="qa-toggle-booking">…</button>
+        <div class="card"><h3 class="mb-3">Быстрые действия</h3>
+          <div class="grid" style="gap:10px">
+            <a class="qa-item" href="schedule.html"><span class="icon-sq">▦</span><div><b>Управлять расписанием</b><span>Закрыть слоты или дни</span></div><span class="chev">›</span></a>
+            <a class="qa-item" href="masters.html"><span class="icon-sq">‹</span><div><b>Список мастеров</b><span id="qa-masters">мастера зарегистрированы</span></div><span class="chev">›</span></a>
+            <a class="qa-item" href="settings.html"><span class="icon-sq">✦</span><div><b>Настройки</b><span>Часы работы, цены, шаблоны писем</span></div><span class="chev">›</span></a>
+            <button class="qa-item" id="qa-toggle-booking"><span class="icon-sq">●</span><div><b id="qa-toggle-t">…</b><span>Временная пауза приёма броней</span></div><span class="chev">›</span></button>
           </div></div>
         <div class="card"><h3 class="mb-2">Последние события</h3><div class="feed" id="feed">Загрузка…</div></div>
       </div>
@@ -45,48 +42,51 @@
 <script>
 (async () => {
   const ctx = await ADMIN.init(); if (!ctx) return;
-  let { settings } = ctx; const { $, $$, esc, today, addDays, fmtDate, fmtHour, hoursToRanges, money, rel, toast, plural } = BS;
-  $('#date-line').textContent = fmtDate(today(), true) + ', ' + new Date().getFullYear();
+  let { settings, user } = ctx; const { $, $$, esc, today, addDays, fmtDate, fmtHour, hoursToRanges, money, rel, toast, plural, seatName } = BS;
+  $('#adm-name').textContent = (user.name || 'Администратор').split(' ')[0];
+  const d0 = BS.parse(today());
+  $('#date-line').textContent = `${BS.DOW_FULL[BS.dowIdx(today())].toLowerCase()}, ${d0.getDate()} ${BS.MONTHS[d0.getMonth()]} ${d0.getFullYear()}`;
   const t = today(); const monthEnd = addDays(t, 31); const weekEnd = addDays(t, 6); const monthStart = t.slice(0, 8) + '01';
+  const prevWeek = [addDays(t, -7), addDays(t, -1)]; const prevMonthStart = BS.iso(new Date(d0.getFullYear(), d0.getMonth() - 1, 1)); const prevMonthEnd = addDays(monthStart, -1);
 
-  const setToggle = () => { $('#qa-toggle-booking').textContent = settings.bookingOpen ? 'Приостановить приём броней' : 'Возобновить приём броней'; };
+  const setToggle = () => { $('#qa-toggle-t').textContent = settings.bookingOpen ? 'Приостановить приём броней' : 'Возобновить приём броней'; };
   setToggle();
   $('#qa-toggle-booking').onclick = async () => { settings.bookingOpen = !settings.bookingOpen; try { await DB.settings.save(settings); toast(settings.bookingOpen ? 'Бронирование открыто' : 'Бронирование приостановлено'); setToggle(); } catch (e) { toast(e.message, 'error'); } };
-  $('#qa-close-today').onclick = async () => {
-    const h = new Date().getHours(); const hours = BS.dayHours(settings, t).filter((x) => x > h);
-    if (!hours.length) return toast('Сегодня рабочих часов уже не осталось');
-    if (!(await BS.confirmDlg('Закрыть остаток дня?', `Будут закрыты слоты с ${fmtHour(hours[0])} до конца дня на всех местах. Существующие брони не отменяются.`))) return;
-    try { for (const x of hours) await DB.slots.close({ date: t, hour: x, seat: null, reason: 'Закрыто администратором' }); toast('Слоты закрыты'); } catch (e) { toast(e.message, 'error'); }
-  };
 
   try {
     const [all, masters] = await Promise.all([DB.bookings.all({ from: addDays(t, -60), to: monthEnd }), DB.masters.list()]);
     const active = all.filter((b) => b.status === 'active');
     const cnt = (from, to) => active.filter((b) => b.date >= from && b.date <= to).length;
-    const rev = (from, to) => active.filter((b) => b.date >= from && b.date <= to).reduce((s, b) => s + (b.price || 0), 0);
-    const totalSlotsToday = BS.dayHours(settings, t).length * settings.seats;
+    const totalToday = BS.dayHours(settings).length * BS.seats(settings);
+    const pct = (a, b) => (b ? Math.round((a - b) / b * 100) : null);
+    const wk = cnt(t, weekEnd), wkPrev = cnt(prevWeek[0], prevWeek[1]); const mo = cnt(monthStart, addDays(monthStart, 31)), moPrev = cnt(prevMonthStart, prevMonthEnd);
+    const trend = (v) => v === null ? '' : `<span class="${v >= 0 ? 'up' : ''}">${v >= 0 ? '↑ +' : '↓ '}${v}%</span>`;
+    const newWeek = masters.filter((m) => new Date(m.created_at) > Date.now() - 7 * 864e5).length;
     $('#metrics').innerHTML = `
-      <div class="card metric"><div class="k">Сегодня</div><div class="num">${cnt(t, t)}</div><div class="sub">${totalSlotsToday ? Math.round(cnt(t, t) / totalSlotsToday * 100) : 0}% загрузка · ${money(rev(t, t))}</div></div>
-      <div class="card metric"><div class="k">Неделя</div><div class="num">${cnt(t, weekEnd)}</div><div class="sub">слотов · ${money(rev(t, weekEnd))}</div></div>
-      <div class="card metric"><div class="k">Месяц</div><div class="num">${cnt(monthStart, addDays(monthStart, 31))}</div><div class="sub">слотов · ${money(rev(monthStart, addDays(monthStart, 31)))}</div></div>
-      <div class="card metric"><div class="k">Мастера</div><div class="num">${masters.length}</div><div class="sub">${masters.filter((m) => !m.blocked).length} активных · ${masters.filter((m) => m.blocked).length} заблок.</div></div>`;
+      <div class="card metric dark"><div class="k"><i>◉</i> Записей сегодня</div><div class="num">${cnt(t, t)}</div><div class="sub">из ${totalToday} слотов <span class="badge green" style="padding:2px 10px;font-size:11px">${totalToday ? Math.round(cnt(t, t) / totalToday * 100) : 0}% заполнено</span></div></div>
+      <div class="card metric"><div class="k"><i>▦</i> На неделе</div><div class="num">${wk}</div><div class="sub">${trend(pct(wk, wkPrev))} к прошлой неделе</div></div>
+      <div class="card metric"><div class="k"><i>✦</i> На месяц</div><div class="num">${mo}</div><div class="sub">${trend(pct(mo, moPrev))} к прошлому месяцу</div></div>
+      <div class="card metric"><div class="k"><i>‹</i> Мастеров</div><div class="num">${masters.length}</div><div class="sub">${newWeek} новых за неделю</div></div>`;
+    $('#qa-masters').textContent = `${plural(masters.length, 'мастер зарегистрирован', 'мастера зарегистрированы', 'мастеров зарегистрированы')}`;
 
-    const up = ADMIN.groupBookings(active.filter((b) => b.date >= t && b.date <= addDays(t, 1))).sort((a, b) => (a.date + BS.pad(a.items[0].hour)).localeCompare(b.date + BS.pad(b.items[0].hour)));
-    $('#upcoming').innerHTML = up.length ? `<table><thead><tr><th>Когда</th><th>Место</th><th>Мастер</th><th>Контакты</th><th></th></tr></thead><tbody>${up.map((g) => `<tr>
-      <td><b>${g.date === t ? 'Сегодня' : 'Завтра'}</b><br><span class="muted small">${hoursToRanges(g.items.map((i) => i.hour))}</span></td><td><span class="badge gray">№${g.seat}</span></td>
-      <td><b>${esc(g.profile?.name || '—')}</b></td><td class="small"><a href="tel:${esc((g.profile?.phone || '').replace(/[^\d+]/g, ''))}">${esc(g.profile?.phone || '')}</a><br><span class="muted">${esc(g.profile?.email || '')}</span></td>
-      <td>${ADMIN.actionsMenu([{ act: 'cancel:' + g.ids.join(','), label: 'Отменить бронь', danger: true }])}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">На сегодня и завтра броней нет</div>';
+    const up = active.filter((b) => b.date >= t && b.date <= addDays(t, 1)).sort((a, b) => (a.date + BS.pad(a.hour)).localeCompare(b.date + BS.pad(b.hour)));
+    $('#upcoming').innerHTML = up.length ? up.map((b) => `<div>
+      <div class="time"><b>${fmtHour(b.hour)}</b><span>${b.date === t ? 'Сегодня' : 'Завтра'}</span></div>
+      <span class="avatar sm">${ADMIN.initial(b.profile?.name)}</span>
+      <div class="who"><b>${esc(b.profile?.name || '—')}</b><span>${esc(b.profile?.phone || b.profile?.email || '')}</span></div>
+      <span class="badge pink"><span class="dot"></span> ${esc(seatName(settings, b.seat))}</span>
+      ${ADMIN.actionsMenu([{ act: 'cancel:' + b.id, label: 'Отменить этот час', danger: true }])}</div>`).join('') : '<div class="empty">На сегодня и завтра броней нет</div>';
     ADMIN.bindMenus($('#upcoming'), async (act) => {
-      if (act.startsWith('cancel:')) { const ids = act.slice(7).split(','); if (!(await BS.confirmDlg('Отменить бронь мастера?', `Будет отменено ${plural(ids.length, 'слот', 'слота', 'слотов')}.`, { ok: 'Отменить', danger: true }))) return;
-        try { for (const id of ids) await DB.bookings.adminCancel(id); toast('Бронь отменена'); location.reload(); } catch (e) { toast(e.message, 'error'); } }
+      if (act.startsWith('cancel:')) { if (!(await BS.confirmDlg('Отменить бронь мастера?', 'Слот снова станет свободным.', { ok: 'Отменить', danger: true }))) return;
+        try { await DB.bookings.adminCancel(act.slice(7)); toast('Бронь отменена'); location.reload(); } catch (e) { toast(e.message, 'error'); } }
     });
 
     const events = [];
-    ADMIN.groupBookings(all).forEach((g) => { events.push({ at: g.created_at, text: `<b>${esc(g.profile?.name || 'Мастер')}</b> забронировал(а) ${plural(g.items.length, 'час', 'часа', 'часов')} на ${fmtDate(g.date)}, место ${g.seat}` });
-      if (g.status === 'cancelled') { const ca = g.items[0].cancelled_at || g.created_at; events.push({ at: ca, gray: true, text: `<b>${esc(g.profile?.name || 'Мастер')}</b> отменил(а) бронь на ${fmtDate(g.date)}` }); } });
-    masters.forEach((m) => events.push({ at: m.created_at, text: `Новый мастер: <b>${esc(m.name || m.email)}</b>` }));
+    ADMIN.groupBookings(all).forEach((g) => { events.push({ at: g.created_at, text: `${esc(g.profile?.name || 'Мастер')} забронировал(а) ${g.items.length === 1 ? 'слот ' + fmtHour(g.items[0].hour) : plural(g.items.length, 'слот', 'слота', 'слотов')} на ${fmtDate(g.date)} — ${esc(seatName(settings, g.seat))}` });
+      if (g.status === 'cancelled') events.push({ at: g.items[0].cancelled_at || g.created_at, gray: true, text: `${esc(g.profile?.name || 'Мастер')} отменил(а) бронь на ${fmtDate(g.date)}` }); });
+    masters.forEach((m) => events.push({ at: m.created_at, text: `Новый мастер: ${esc(m.name || m.email)}` }));
     events.sort((a, b) => new Date(b.at) - new Date(a.at));
-    $('#feed').innerHTML = events.slice(0, 8).map((e) => `<div><i class="${e.gray ? 'gray' : ''}"></i><span>${e.text}</span><time>${rel(e.at)}</time></div>`).join('') || '<div class="muted">Событий пока нет</div>';
+    $('#feed').innerHTML = events.slice(0, 6).map((e) => `<div><i class="${e.gray ? 'gray' : ''}"></i><div>${e.text}<time>${rel(e.at)}</time></div></div>`).join('') || '<div class="muted">Событий пока нет</div>';
   } catch (e) { toast(e.message, 'error'); console.error(e); }
 })();
 </script>

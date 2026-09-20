@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Вход — Beauty Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -15,31 +13,27 @@
 <body>
 <header id="site-header"></header>
 
-<div class="auth-wrap">
-  <div class="card auth-card">
+<div class="auth-bg" style="align-items:center">
+  <div class="auth-card">
     <div class="eyebrow">Вход</div>
-    <h2>С возвращением</h2>
-    <p class="muted mb-3">Войдите, чтобы бронировать и управлять записями.</p>
+    <h2>С возвращением,<br><span class="ac">мастер</span></h2>
+    <p class="lead">Войдите, чтобы забронировать рабочее место.</p>
     <form class="form" id="login-form" novalidate>
       <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="email" placeholder="you@example.com" required><div class="err"></div></div>
-      <div class="field"><label for="password">Пароль</label><div class="pw-wrap"><input class="input" id="password" type="password" autocomplete="current-password" required><button type="button" class="pw-toggle" aria-label="Показать пароль"></button></div><div class="err"></div></div>
-      <div class="row between">
-        <label class="check"><input type="checkbox" id="remember" checked><span>Запомнить меня</span></label>
-        <button type="button" class="linkbtn" id="forgot">Забыли пароль?</button>
-      </div>
+      <div class="field"><label for="password"><span>Пароль</span><button type="button" class="linkbtn" id="forgot" style="text-decoration:underline">Забыли пароль?</button></label><div class="pw-wrap"><input class="input" id="password" type="password" autocomplete="current-password" placeholder="Ваш пароль" required><button type="button" class="pw-toggle">показать</button></div><div class="err"></div></div>
+      <label class="check"><input type="checkbox" id="remember" checked><span>Запомнить меня на этом устройстве</span></label>
       <div class="form-msg" id="msg"></div>
       <button class="btn block" type="submit" id="submit">Войти</button>
     </form>
-    <p class="muted small mt-3" style="text-align:center">Нет аккаунта? <a href="register.html" class="pink" style="font-weight:700">Зарегистрироваться</a></p>
+    <div class="divider">нет аккаунта?</div>
+    <p class="center"><a class="linkbtn ul" href="register.html">Создать аккаунт ›</a></p>
   </div>
 </div>
 
-<footer id="site-footer"></footer>
 <script>
 (async () => {
-  const ctx = await BS.init({ redirectIfAuthed: true }); if (!ctx) return;
+  const ctx = await BS.init({ redirectIfAuthed: true, simple: true }); if (!ctx) return;
   const { $, setErr, showMsg, busy } = BS;
-  $('.pw-toggle').innerHTML = BS.ICON.eye;
   const next = new URLSearchParams(location.search).get('next');
   if (location.hash.includes('type=signup')) showMsg($('#msg'), 'Email подтверждён. Теперь войдите.', 'ok');
   $('#login-form').addEventListener('submit', async (e) => {

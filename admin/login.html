@@ -5,34 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Вход в админ‑панель — Beauty Studio</title>
 <meta name="robots" content="noindex">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/config.js"></script>
 <script src="../js/db.js"></script>
 <script src="../js/app.js"></script>
 </head>
-<body style="background:var(--bg-soft)">
-<div style="background:var(--ink);color:#fff"><div class="container" style="height:68px;display:flex;align-items:center;justify-content:space-between"><a class="logo" href="../index.html" style="color:#fff"><i></i>BEAUTY STUDIO</a><span class="badge pink">Admin</span></div></div>
+<body style="background:#f7f7f7">
+<header class="header simple dark"><div class="container"><a class="logo" href="../index.html" style="color:#fff"><i></i>BEAUTY STUDIO <span class="badge tag" style="margin-left:10px">Admin</span></a><a class="back" href="../index.html">‹ На сайт</a></div></header>
 
-<div class="auth-wrap" style="min-height:calc(100vh - 68px)">
-  <div class="card auth-card">
+<div class="auth-bg gray" style="align-items:center">
+  <div class="auth-card">
+    <span class="icon-circle dark" style="width:64px;height:64px;font-size:20px;margin-bottom:28px">◆</span>
     <div class="eyebrow">Админ‑панель</div>
     <h2>Вход для администратора</h2>
-    <p class="muted mb-3">Только для сотрудников студии.</p>
+    <p class="lead">Только владелец салона имеет доступ к этому разделу.</p>
     <form class="form" id="form" novalidate>
-      <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="username" required></div>
-      <div class="field"><label for="password">Пароль</label><div class="pw-wrap"><input class="input" id="password" type="password" autocomplete="current-password" required><button type="button" class="pw-toggle"></button></div></div>
+      <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="username" placeholder="admin@beautystudio.ru" required></div>
+      <div class="field"><label for="password">Пароль</label><div class="pw-wrap"><input class="input" id="password" type="password" autocomplete="current-password" placeholder="Ваш пароль администратора" required><button type="button" class="pw-toggle">показать</button></div></div>
       <div class="form-msg" id="msg"></div>
       <button class="btn block" type="submit" id="submit">Войти в админку</button>
     </form>
-    <p class="muted small mt-3" style="text-align:center"><a href="../index.html">‹ Вернуться на сайт</a></p>
+    <div class="divider" style="margin-bottom:0"></div>
+    <p class="center muted small mt-3">Если вы мастер, а не администратор —<br><a href="../login.html" style="text-decoration:underline;color:var(--ink)">войдите в обычный аккаунт</a></p>
   </div>
 </div>
 <script>
 (async () => {
-  const { $, showMsg, busy } = BS; $('.pw-toggle').innerHTML = BS.ICON.eye; BS.pwToggles();
+  const { $, showMsg, busy } = BS; BS.pwToggles();
   const me = await DB.auth.me().catch(() => null);
   if (me && me.role === 'admin') { location.replace('index.html'); return; }
   $('#form').addEventListener('submit', async (e) => {

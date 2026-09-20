@@ -4,8 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Контакты — Beauty Studio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -15,57 +13,56 @@
 <body>
 <header id="site-header"></header>
 
-<div class="container">
-  <div class="page-head">
-    <div><div class="eyebrow">Контакты</div><h1 style="font-size:clamp(30px,5vw,52px)">Как нас найти</h1><p>Студия находится в Перми. Приходите на бронь за 10 минут до начала — администратор встретит и примет оплату.</p></div>
-    <span class="badge" id="open-badge"><span class="dot"></span> …</span>
-  </div>
+<section class="section">
+  <div class="container">
+    <div class="section-head"><div class="eyebrow">Контакты</div><h1 style="font-size:clamp(36px,5vw,64px)">Свяжитесь <span class="ac">с нами</span></h1><p class="lead">Мы всегда на связи. Звоните, пишите или приезжайте — будем рады встрече.</p></div>
 
-  <div class="grid grid-3 mb-3">
-    <div class="card"><div class="eyebrow">Телефон</div><h3><a id="c-phone" href="tel:">—</a></h3><p class="muted small mt-1">Звонки и мессенджеры в рабочее время</p></div>
-    <div class="card"><div class="eyebrow">Email</div><h3><a id="c-email" href="mailto:">—</a></h3><p class="muted small mt-1">Ответим в течение дня</p></div>
-    <div class="card"><div class="eyebrow">Адрес</div><h3 id="c-address">—</h3><p class="muted small mt-1">Вход со стороны улицы, 1 этаж</p></div>
-  </div>
-
-  <div class="two-wide" style="grid-template-columns:1fr 380px">
-    <div class="map">
-      <div class="pin"><i></i><b>Beauty Studio</b></div>
-      <a class="btn" id="route-btn" href="#" target="_blank" rel="noopener">Построить маршрут в Яндекс Картах</a>
-    </div>
-    <div class="card">
-      <div class="eyebrow">График работы</div>
-      <div class="hours" id="hours"></div>
-    </div>
-  </div>
-
-  <section class="section">
-    <div class="card soft">
-      <div class="row between">
-        <div><div class="eyebrow">Соцсети</div><h3>Мы на связи</h3></div>
-        <div class="socials" id="socials"></div>
+    <div class="two-wide" style="grid-template-columns:1fr 1.4fr;gap:28px">
+      <div class="grid" style="gap:20px">
+        <div class="card contact-card"><span class="icon-circle">✆</span><div><div class="k">Телефон</div><a class="v" id="c-phone" href="tel:">—</a><div class="s" id="c-phone-s">Ежедневно</div></div></div>
+        <div class="card contact-card"><span class="icon-circle">@</span><div><div class="k">Email</div><a class="v" id="c-email" href="mailto:">—</a><div class="s">Отвечаем в течение дня</div></div></div>
+        <div class="card contact-card"><span class="icon-circle">◉</span><div><div class="k">Адрес</div><div class="v" id="c-address">—</div><div class="s" id="c-address-s"></div></div></div>
+      </div>
+      <div class="map">
+        <div class="road2"></div>
+        <div class="pin"></div>
+        <div class="mapcard"><div><b>Beauty Studio</b><span id="m-address"></span></div><a class="btn sm" id="route-btn" href="#" target="_blank" rel="noopener">Построить маршрут ›</a></div>
       </div>
     </div>
-  </section>
-</div>
+
+    <div class="card mt-4">
+      <div class="row between mb-2"><h3>График работы</h3><span class="badge green" id="open-badge"><span class="dot"></span> …</span></div>
+      <div class="hours" id="hours"></div>
+    </div>
+
+    <div class="card pinksoft center mt-4" style="padding:56px 32px">
+      <h2 style="font-size:clamp(24px,3vw,34px)">Подписывайтесь на <span class="ac">наши соцсети</span></h2>
+      <p class="muted mt-2">Новости, акции и работы наших мастеров</p>
+      <div class="socials mt-4" id="socials"></div>
+    </div>
+  </div>
+</section>
 
 <footer id="site-footer"></footer>
 <script>
 (async () => {
   const ctx = await BS.init(); if (!ctx) return;
-  const { settings } = ctx; const c = settings.contacts; const { $, esc } = BS;
+  const { settings } = ctx; const c = settings.contacts; const { $, esc, fmtHour } = BS;
   $('#c-phone').textContent = c.phone; $('#c-phone').href = 'tel:' + c.phone.replace(/[^\d+]/g, '');
+  $('#c-phone-s').textContent = `Ежедневно с ${fmtHour(settings.hours.open)} до ${fmtHour(settings.hours.close)}`;
   $('#c-email').textContent = c.email; $('#c-email').href = 'mailto:' + c.email;
-  $('#c-address').textContent = c.address;
+  $('#c-address').textContent = c.address; $('#c-address-s').textContent = c.addressNote || ''; $('#m-address').textContent = c.address;
   $('#route-btn').href = c.mapUrl || ('https://yandex.ru/maps/?text=' + encodeURIComponent(c.address));
-  const socialNames = { instagram: 'Instagram', telegram: 'Telegram', vk: 'ВКонтакте', tiktok: 'TikTok' };
-  $('#socials').innerHTML = Object.entries(socialNames).map(([k, n]) => `<a href="${esc(c.socials[k] || '#')}" target="_blank" rel="noopener">${n}</a>`).join('');
+  const soc = { instagram: ['Instagram', '‹'], telegram: ['Telegram', '✈'], vk: ['ВКонтакте', '◆'], tiktok: ['TikTok', '▶'] };
+  $('#socials').innerHTML = Object.entries(soc).map(([k, [n, ic]]) => `<a href="${esc(c.socials[k] || '#')}" target="_blank" rel="noopener"><i>${ic}</i>${n}</a>`).join('');
 
-  const todayIdx = BS.dowIdx(BS.today());
-  $('#hours').innerHTML = settings.schedule.map((s, i) => `<div class="${i === todayIdx ? 'today' : ''}"><span>${BS.DOW_FULL[i]}</span><span>${s.closed ? 'выходной' : BS.fmtHour(s.open) + ' – ' + BS.fmtHour(s.close)}</span></div>`).join('');
-
-  const s = settings.schedule[todayIdx]; const h = new Date().getHours(); const b = $('#open-badge');
-  if (!s.closed && h >= s.open && h < s.close) b.innerHTML = `<span class="dot pulse"></span> Сейчас открыто · до ${BS.fmtHour(s.close)}`;
-  else b.innerHTML = `<span class="dot" style="background:var(--ink-3)"></span> Сейчас закрыто${s.closed ? '' : ' · откроемся в ' + BS.fmtHour(s.open)}`;
+  const ti = BS.dowIdx(BS.today()); const range = `${fmtHour(settings.hours.open)} — ${fmtHour(settings.hours.close)}`;
+  const days = BS.DOW_FULL.map((d, i) => `<div class="${i === ti ? 'today' : ''}"><span>${d}${i === ti ? ' (Сегодня)' : ''}</span><span>${range}</span></div>`);
+  days.push('<div><span>Праздничные дни</span><span>по записи</span></div>');
+  $('#hours').innerHTML = days.join('');
+  const h = new Date().getHours(); const b = $('#open-badge');
+  if (h >= settings.hours.open && h < settings.hours.close) b.innerHTML = `<span class="dot pulse"></span> Сейчас открыто`;
+  else { b.className = 'badge gray'; b.innerHTML = `<span class="dot"></span> Сейчас закрыто · откроемся в ${fmtHour(settings.hours.open)}`; }
 })();
 </script>
 </body>

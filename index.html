@@ -3,10 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beauty Studio — аренда рабочих мест для мастеров в Перми</title>
-<meta name="description" content="Бронируйте рабочее место в студии красоты онлайн: календарь свободных слотов, почасовая аренда, оплата на месте. Пермь, ул. Тихоокеанская, 38г.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<title>Beauty Studio — рабочее место для вашего творчества</title>
+<meta name="description" content="Бронируйте рабочее место в салоне-коворкинге онлайн: календарь свободных слотов, почасовая аренда, оплата на месте. Пермь, ул. Тихоокеанская, 38.">
 <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
@@ -17,83 +15,63 @@
 <header id="site-header"></header>
 
 <section class="hero">
-  <div class="container hero-grid">
-    <div>
-      <span class="badge" id="free-badge"><span class="dot pulse"></span> Проверяем свободные места…</span>
-      <h1 class="mt-3">Рабочее место<br>для мастера — <span class="pink">на час</span><br>или на весь день</h1>
-      <p class="lead">Оборудованные места в студии красоты в Перми. Выбирайте слоты в календаре, бронируйте за минуту, оплачивайте на месте.</p>
-      <div class="hero-actions">
-        <a class="btn pink" href="booking.html">Забронировать место</a>
-        <a class="btn ghost" href="prices.html">Смотреть цены</a>
-      </div>
+  <div class="container">
+    <span class="badge pink-outline" id="free-badge"><span class="dot"></span> Свободные места есть сегодня</span>
+    <h1>Рабочее место<br>для <span class="ac">вашего</span> творчества</h1>
+    <p class="lead">Удобное бронирование рабочего места в нашем салоне‑коворкинге. Выбирайте дату, время и работайте с комфортом.</p>
+    <div class="hero-actions">
+      <a class="btn" href="booking.html">Забронировать место ›</a>
+      <a class="textlink" href="#about">О салоне</a>
     </div>
-    <div class="hero-visual">
-      <div class="stat"><b id="stat-seats">2</b><span class="small muted">рабочих места</span></div>
-      <div class="tag"><span class="small" style="opacity:.75">Пермь, ул. Тихоокеанская, 38г</span><b>Beauty Studio</b></div>
+    <div class="stats">
+      <div><b id="st-seats">2</b><span>Рабочих места</span></div>
+      <div><b id="st-hours">10—20</b><span>Часы работы</span></div>
+      <div><b id="st-days">30</b><span>Дней вперёд</span></div>
     </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="about">
   <div class="container">
-    <div class="eyebrow">Почему мы</div>
-    <h2 class="mb-3">Всё, чтобы вы работали, а не искали</h2>
+    <div class="section-head"><div class="eyebrow">О салоне</div><h2>Всё для <span class="ac">комфортной</span> работы</h2></div>
     <div class="grid grid-4">
-      <div class="card"><div class="num pink">01</div><h3 class="mt-2">Онлайн‑бронь</h3><p class="muted mt-1">Календарь на месяц вперёд. Свободные слоты видны сразу, без звонков и переписки.</p></div>
-      <div class="card"><div class="num pink">02</div><h3 class="mt-2">Оборудованные места</h3><p class="muted mt-1">Кресло, зеркало с подсветкой, стерилизатор, розетки, вода. Приходите со своим инструментом.</p></div>
-      <div class="card"><div class="num pink">03</div><h3 class="mt-2">Гибкая оплата</h3><p class="muted mt-1">Почасово, на день или абонемент. Оплата на месте: наличные, карта или СБП.</p></div>
-      <div class="card"><div class="num pink">04</div><h3 class="mt-2">Свободная отмена</h3><p class="muted mt-1">Планы изменились? Отменяйте бронь в личном кабинете за 12 часов без штрафов.</p></div>
+      <div class="feature"><div class="icon-sq">✦</div><h3>Уютная атмосфера</h3><p>Светлое помещение, продуманный интерьер и комфортная зона ожидания для клиентов.</p></div>
+      <div class="feature"><div class="icon-sq">◆</div><h3>Профессиональное оборудование</h3><p>Регулируемые кресла, лампы, вытяжки и всё необходимое для работы мастера.</p></div>
+      <div class="feature"><div class="icon-sq">●</div><h3>Удобное расположение</h3><p>Центр города, рядом остановка и парковка. Клиентам легко добраться.</p></div>
+      <div class="feature"><div class="icon-sq">✿</div><h3>Гибкое бронирование</h3><p id="f-cancel">Бронируйте один час или несколько подряд. Меняйте план — отмена за 12 часов.</p></div>
     </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section" style="padding-top:0">
   <div class="container">
-    <div class="card dark" style="padding:40px">
-      <div class="two" style="align-items:center">
-        <div>
-          <div class="eyebrow" style="color:#a9a9a9">Условия аренды</div>
-          <h2>Просто и прозрачно</h2>
-          <p class="muted mt-2">Регистрируетесь как мастер, выбираете дату и часы, подтверждаете бронь. Место закреплено за вами до конца выбранного времени.</p>
-          <a class="btn pink mt-3" href="register.html">Стать мастером студии</a>
-        </div>
-        <ul class="list" style="color:#fff">
-          <li>Бронь минимум на 1 час, максимум — весь рабочий день</li>
-          <li>Слот считается занятым только после подтверждения на сайте</li>
-          <li>Оплата на месте до начала работы</li>
-          <li>Отмена без штрафа — за 12 часов и более</li>
-          <li>Расходники и инструменты — свои, уборка места — за нами</li>
-          <li>Бронь можно продлить, если следующий слот свободен</li>
-        </ul>
+    <div class="card dark" style="padding:56px 48px">
+      <div class="eyebrow">Условия аренды</div>
+      <h2>Прозрачно <span class="ac">и просто</span></h2>
+      <div class="dark-stats">
+        <div><b id="d-hours">10—20</b><span>График работы салона</span></div>
+        <div><b>1 час</b><span>Минимальный слот брони</span></div>
+        <div><b id="d-seats">2</b><span>Рабочих места одновременно</span></div>
+        <div><b id="d-cancel">12 ч</b><span>До брони — возможность отмены</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section" style="padding-top:0">
   <div class="container">
-    <div class="row between mb-3">
-      <div><div class="eyebrow">Цены</div><h2>Три тарифа</h2></div>
-      <a class="btn ghost" href="prices.html">Подробный прайс</a>
-    </div>
+    <div class="section-head"><div class="eyebrow">Тарифы</div><h2>Простые <span class="ac">цены</span></h2></div>
     <div class="grid grid-3" id="price-cards"></div>
   </div>
 </section>
 
-<section class="section">
+<section class="section" style="padding-top:0">
   <div class="container">
-    <div class="two">
-      <div class="card soft">
-        <div class="eyebrow">Контакты</div>
-        <h3 id="c-address">г. Пермь, ул. Тихоокеанская, 38г</h3>
-        <p class="mt-2"><a id="c-phone" href="tel:">—</a><br><a id="c-email" href="mailto:">—</a></p>
-        <a class="btn light sm mt-3" href="contacts.html">Как добраться</a>
-      </div>
-      <div class="card soft">
-        <div class="eyebrow">Соцсети</div>
-        <h3>Следите за новостями студии</h3>
-        <div class="socials mt-3" id="socials"></div>
-      </div>
+    <div class="card pinksoft center" style="padding:56px 32px">
+      <h2 style="font-size:clamp(24px,3vw,34px)">Подписывайтесь на <span class="ac">наши соцсети</span></h2>
+      <p class="muted mt-2">Новости, акции и работы наших мастеров</p>
+      <div class="socials mt-4" id="socials"></div>
+      <p class="muted small mt-4"><span id="c-address"></span> · <a id="c-phone" href="tel:"></a> · <a id="c-email" href="mailto:"></a></p>
     </div>
   </div>
 </section>
@@ -104,35 +82,41 @@
 (async () => {
   const ctx = await BS.init(); if (!ctx) return;
   const { settings } = ctx; const { $, esc, money, today } = BS;
-  $('#stat-seats').textContent = settings.seats;
+  const seats = BS.seats(settings); const hrs = `${settings.hours.open}—${settings.hours.close}`;
+  $('#st-seats').textContent = seats; $('#d-seats').textContent = seats;
+  $('#st-hours').textContent = hrs; $('#d-hours').textContent = hrs;
+  $('#st-days').textContent = settings.rules.maxDaysAhead;
+  $('#d-cancel').textContent = settings.rules.cancelHours + ' ч';
+  $('#f-cancel').textContent = `Бронируйте один час или несколько подряд. Меняйте план — отмена за ${settings.rules.cancelHours} часов.`;
   const c = settings.contacts;
   $('#c-address').textContent = c.address;
   $('#c-phone').textContent = c.phone; $('#c-phone').href = 'tel:' + c.phone.replace(/[^\d+]/g, '');
   $('#c-email').textContent = c.email; $('#c-email').href = 'mailto:' + c.email;
-  const socialNames = { instagram: 'Instagram', telegram: 'Telegram', vk: 'ВКонтакте', tiktok: 'TikTok' };
-  $('#socials').innerHTML = Object.entries(socialNames).map(([k, n]) => `<a href="${esc(c.socials[k] || '#')}" target="_blank" rel="noopener">${n}</a>`).join('');
+  const soc = { instagram: ['Instagram', '‹'], telegram: ['Telegram', '✈'], vk: ['ВКонтакте', '◆'], tiktok: ['TikTok', '▶'] };
+  $('#socials').innerHTML = Object.entries(soc).map(([k, [n, ic]]) => `<a href="${esc(c.socials[k] || '#')}" target="_blank" rel="noopener"><i>${ic}</i>${n}</a>`).join('');
 
   const p = settings.prices;
   $('#price-cards').innerHTML = `
-    <div class="card"><div class="muted small">Час</div><div class="price mt-2">${money(p.hour)}<small> / час</small></div><p class="muted mt-2">Любое количество часов подряд или вразбивку.</p></div>
-    <div class="card" style="border-color:var(--pink)"><span class="badge pink">Выгодно</span><div class="price mt-2">${money(p.day)}<small> / день</small></div><p class="muted mt-2">Все часы дня за одним местом — автоматически по тарифу «день».</p></div>
-    <div class="card"><div class="muted small">Абонемент</div><div class="price mt-2">${money(p.subscription)}<small> / ${p.subscriptionHours} ч</small></div><p class="muted mt-2">Оформляется у администратора, действует месяц.</p></div>`;
+    <div class="price-card"><div class="k">Час</div><div class="price">${money(p.hour).replace(' ₽', '')}<small>₽</small></div><div class="sub">за 1 час аренды</div>
+      <ul class="plist"><li>Любое свободное рабочее место</li><li>Доступ ко всему оборудованию</li><li>Гибкая отмена за ${settings.rules.cancelHours} часов</li></ul><a class="btn outline" href="booking.html">Забронировать</a></div>
+    <div class="price-card popular"><span class="badge tag">Популярный</span><div class="k">День</div><div class="price">${money(p.day).replace(' ₽', '')}<small>₽</small></div><div class="sub">${BS.dayHours(settings).length} часов работы — выгоднее на ${Math.max(0, Math.round((1 - p.day / (p.hour * BS.dayHours(settings).length)) * 100))}%</div>
+      <ul class="plist"><li>Полный рабочий день (${BS.fmtHour(settings.hours.open)}–${BS.fmtHour(settings.hours.close)})</li><li>Закрепление за конкретным местом</li><li>Хранение материалов на день</li></ul><a class="btn pinkfill" href="booking.html">Забронировать</a></div>
+    <div class="price-card"><div class="k">Абонемент</div><div class="price">${money(p.subscription).replace(' ₽', '')}<small>₽</small></div><div class="sub">в месяц — лучшая экономия</div>
+      <ul class="plist"><li>До ${p.subscriptionHours} часов работы в месяц</li><li>Приоритет в бронировании</li><li>Оформляется у администратора</li></ul><a class="btn outline" href="prices.html">Подробнее</a></div>`;
 
-  // Бейдж «Свободные места есть сегодня»
   try {
-    const t = today(); const hours = BS.dayHours(settings, t);
+    const t = today(); const hours = BS.dayHours(settings);
     const [occ, closed] = await Promise.all([DB.slots.occupied(t, t), DB.slots.closed(t, t)]);
-    const nowH = new Date().getHours();
-    let free = 0;
-    hours.filter((h) => h > nowH).forEach((h) => { for (let s = 1; s <= settings.seats; s++) {
+    const nowH = new Date().getHours(); let free = 0;
+    hours.filter((h) => h > nowH).forEach((h) => { for (let s = 1; s <= seats; s++) {
       const busy = occ.some((o) => o.hour === h && o.seat === s);
       const cl = closed.some((c) => (c.hour === null || c.hour === h) && (c.seat === null || c.seat === s));
       if (!busy && !cl) free++; } });
     const b = $('#free-badge');
-    if (!hours.length || closed.some((c) => c.hour === null && c.seat === null)) b.innerHTML = '<span class="dot" style="background:var(--ink-3)"></span> Сегодня студия закрыта';
-    else if (free > 0) b.innerHTML = `<span class="dot pulse"></span> Свободные места есть сегодня · ${BS.plural(free, 'слот', 'слота', 'слотов')}`;
-    else b.innerHTML = '<span class="dot" style="background:var(--warn)"></span> Сегодня всё занято — смотрите завтра';
-  } catch (e) { $('#free-badge').innerHTML = '<span class="dot pulse"></span> Бронируйте онлайн'; }
+    if (closed.some((c) => c.hour === null && c.seat === null)) b.innerHTML = '<span class="dot" style="background:var(--ink-4)"></span> Сегодня салон закрыт';
+    else if (free > 0) b.innerHTML = '<span class="dot"></span> Свободные места есть сегодня';
+    else b.innerHTML = '<span class="dot" style="background:var(--ink-4)"></span> На сегодня всё занято — смотрите завтра';
+  } catch (e) {}
 })();
 </script>
 </body>

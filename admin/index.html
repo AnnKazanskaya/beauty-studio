@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Дашборд — Beauty Studio Admin</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/style.css?v=3">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/config.js"></script>
-<script src="../js/db.js"></script>
-<script src="../js/app.js"></script>
-<script src="../js/admin.js"></script>
+<script src="../js/config.js?v=3"></script>
+<script src="../js/db.js?v=3"></script>
+<script src="../js/app.js?v=3"></script>
+<script src="../js/admin.js?v=3"></script>
 </head>
 <body>
 <div class="admin-topbar" id="topbar"></div>
@@ -60,12 +60,12 @@
     const totalToday = BS.dayHours(settings).length * BS.seats(settings);
     const pct = (a, b) => (b ? Math.round((a - b) / b * 100) : null);
     const wk = cnt(t, weekEnd), wkPrev = cnt(prevWeek[0], prevWeek[1]); const mo = cnt(monthStart, addDays(monthStart, 31)), moPrev = cnt(prevMonthStart, prevMonthEnd);
-    const trend = (v) => v === null ? '' : `<span class="${v >= 0 ? 'up' : ''}">${v >= 0 ? '↑ +' : '↓ '}${v}%</span>`;
+    const trend = (v, label) => v === null ? label : `<span class="${v >= 0 ? 'up' : ''}">${v >= 0 ? '↑ +' : '↓ '}${v}%</span> ${label}`;
     const newWeek = masters.filter((m) => new Date(m.created_at) > Date.now() - 7 * 864e5).length;
     $('#metrics').innerHTML = `
       <div class="card metric dark"><div class="k"><i>◉</i> Записей сегодня</div><div class="num">${cnt(t, t)}</div><div class="sub">из ${totalToday} слотов <span class="badge green" style="padding:2px 10px;font-size:11px">${totalToday ? Math.round(cnt(t, t) / totalToday * 100) : 0}% заполнено</span></div></div>
-      <div class="card metric"><div class="k"><i>▦</i> На неделе</div><div class="num">${wk}</div><div class="sub">${trend(pct(wk, wkPrev))} к прошлой неделе</div></div>
-      <div class="card metric"><div class="k"><i>✦</i> На месяц</div><div class="num">${mo}</div><div class="sub">${trend(pct(mo, moPrev))} к прошлому месяцу</div></div>
+      <div class="card metric"><div class="k"><i>▦</i> На неделе</div><div class="num">${wk}</div><div class="sub">${trend(pct(wk, wkPrev), 'слотов на ближайшие 7 дней')}</div></div>
+      <div class="card metric"><div class="k"><i>✦</i> На месяц</div><div class="num">${mo}</div><div class="sub">${trend(pct(mo, moPrev), 'слотов в этом месяце')}</div></div>
       <div class="card metric"><div class="k"><i>◐</i> Мастеров</div><div class="num">${masters.length}</div><div class="sub">${newWeek} новых за неделю</div></div>`;
     $('#qa-masters').textContent = `${plural(masters.length, 'мастер зарегистрирован', 'мастера зарегистрированы', 'мастеров зарегистрированы')}`;
 

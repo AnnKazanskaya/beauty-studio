@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Настройки — Beauty Studio Admin</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/db.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/admin.js"></script>
+</head>
+<body>
+<div class="admin-topbar" id="topbar"></div>
+<div class="admin">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-head"><div><h2>Настройки салона</h2><p class="muted">График, цены, контакты, письма и правила</p></div><button class="btn pink" id="save">Сохранить изменения</button></div>
+    <div class="set-nav" id="set-nav">
+      <button class="active" data-s="schedule">График и места</button><button data-s="prices">Тарифы</button><button data-s="contacts">Контакты</button><button data-s="emails">Шаблоны писем</button><button data-s="rules">Правила и уведомления</button>
+    </div>
+
+    <section class="card" data-sec="schedule">
+      <h3>График работы</h3><p class="muted small mt-1 mb-3">Часы, в которые мастера могут бронировать место. Слоты — по одному часу.</p>
+      <div id="sched"></div>
+      <div class="field mt-3" style="max-width:240px"><label>Количество рабочих мест</label><input class="input" type="number" min="1" max="10" id="seats"></div>
+    </section>
+
+    <section class="card hidden" data-sec="prices">
+      <h3>Тарифы</h3><p class="muted small mt-1 mb-3">Цены в рублях. Тариф «день» применяется автоматически, когда выбраны все часы дня за одним местом.</p>
+      <div class="grid grid-2" style="max-width:640px">
+        <div class="field"><label>Час, ₽</label><input class="input" type="number" min="0" id="p-hour"></div>
+        <div class="field"><label>День, ₽</label><input class="input" type="number" min="0" id="p-day"></div>
+        <div class="field"><label>Абонемент, ₽</label><input class="input" type="number" min="0" id="p-sub"></div>
+        <div class="field"><label>Часов в абонементе</label><input class="input" type="number" min="1" id="p-subh"></div>
+      </div>
+    </section>
+
+    <section class="card hidden" data-sec="contacts">
+      <h3>Контакты салона</h3><p class="muted small mt-1 mb-3">Показываются на главной, в контактах и подвале.</p>
+      <div class="grid grid-2" style="max-width:760px">
+        <div class="field"><label>Адрес</label><input class="input" id="c-address"></div>
+        <div class="field"><label>Телефон</label><input class="input" id="c-phone"></div>
+        <div class="field"><label>Email</label><input class="input" id="c-email"></div>
+        <div class="field"><label>Ссылка на Яндекс Карты</label><input class="input" id="c-map"></div>
+        <div class="field"><label>Instagram</label><input class="input" id="s-instagram" placeholder="https://instagram.com/…"></div>
+        <div class="field"><label>Telegram</label><input class="input" id="s-telegram" placeholder="https://t.me/…"></div>
+        <div class="field"><label>ВКонтакте</label><input class="input" id="s-vk" placeholder="https://vk.com/…"></div>
+        <div class="field"><label>TikTok</label><input class="input" id="s-tiktok" placeholder="https://tiktok.com/@…"></div>
+      </div>
+    </section>
+
+    <section class="card hidden" data-sec="emails">
+      <h3>Шаблоны уведомлений</h3><p class="muted small mt-1 mb-3">Переменные: {name}, {date}, {time}, {seat}, {address}. Тексты используются при отправке писем мастерам.</p>
+      <div class="form" style="max-width:760px">
+        <div class="field"><label>Подтверждение брони</label><textarea class="input" rows="3" id="e-confirm"></textarea></div>
+        <div class="field"><label>Отмена брони</label><textarea class="input" rows="3" id="e-cancel"></textarea></div>
+        <div class="field"><label>Напоминание за день</label><textarea class="input" rows="3" id="e-reminder"></textarea></div>
+      </div>
+    </section>
+
+    <section class="card hidden" data-sec="rules">
+      <h3>Правила бронирования</h3>
+      <div class="grid grid-3 mt-3" style="max-width:760px">
+        <div class="field"><label>Отмена не позже, часов до начала</label><input class="input" type="number" min="0" id="r-cancel"></div>
+        <div class="field"><label>Горизонт брони, дней вперёд</label><input class="input" type="number" min="1" max="365" id="r-days"></div>
+        <div class="field"><label>Макс. слотов за одну бронь</label><input class="input" type="number" min="1" id="r-max"></div>
+      </div>
+      <div class="prof-row mt-3"><div><div class="v">Приём броней открыт</div><div class="muted small">Выключите, чтобы временно остановить бронирование на сайте</div></div><label class="switch"><input type="checkbox" id="r-open"><span></span></label></div>
+      <h3 class="mt-4">Уведомления администратору</h3>
+      <div class="prof-row"><div class="v">Новая бронь</div><label class="switch"><input type="checkbox" id="n-new"><span></span></label></div>
+      <div class="prof-row"><div class="v">Отмена брони</div><label class="switch"><input type="checkbox" id="n-cancel"><span></span></label></div>
+      <div class="prof-row"><div class="v">Регистрация нового мастера</div><label class="switch"><input type="checkbox" id="n-master"><span></span></label></div>
+    </section>
+  </main>
+</div>
+<script>
+(async () => {
+  const ctx = await ADMIN.init(); if (!ctx) return;
+  const s = JSON.parse(JSON.stringify(ctx.settings)); const { $, $$, toast } = BS;
+
+  $$('#set-nav button').forEach((b) => (b.onclick = () => { $$('#set-nav button').forEach((x) => x.classList.remove('active')); b.classList.add('active'); $$('[data-sec]').forEach((sec) => sec.classList.toggle('hidden', sec.dataset.sec !== b.dataset.s)); }));
+
+  const hourOpts = (v) => Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${h === v ? 'selected' : ''}>${BS.fmtHour(h)}</option>`).join('');
+  $('#sched').innerHTML = `<div class="sched-row" style="border:0"><span></span><span class="muted small">Открытие</span><span class="muted small">Закрытие</span><span class="muted small">Раб.</span></div>` +
+    s.schedule.map((d, i) => `<div class="sched-row ${d.closed ? 'off' : ''}" data-i="${i}"><b>${BS.DOW_FULL[i]}</b><select class="input" data-f="open">${hourOpts(d.open)}</select><select class="input" data-f="close">${hourOpts(d.close)}</select><label class="switch"><input type="checkbox" data-f="on" ${d.closed ? '' : 'checked'}><span></span></label></div>`).join('');
+  $$('.sched-row [data-f="on"]').forEach((c) => c.addEventListener('change', () => c.closest('.sched-row').classList.toggle('off', !c.checked)));
+  const v = (id, val) => { $(id).value = val ?? ''; };
+  v('#seats', s.seats); v('#p-hour', s.prices.hour); v('#p-day', s.prices.day); v('#p-sub', s.prices.subscription); v('#p-subh', s.prices.subscriptionHours);
+  v('#c-address', s.contacts.address); v('#c-phone', s.contacts.phone); v('#c-email', s.contacts.email); v('#c-map', s.contacts.mapUrl);
+  ['instagram', 'telegram', 'vk', 'tiktok'].forEach((k) => v('#s-' + k, s.contacts.socials[k]));
+  v('#e-confirm', s.emails.confirm); v('#e-cancel', s.emails.cancel); v('#e-reminder', s.emails.reminder);
+  v('#r-cancel', s.rules.cancelHours); v('#r-days', s.rules.maxDaysAhead); v('#r-max', s.rules.maxSlotsPerBooking);
+  $('#r-open').checked = !!s.bookingOpen; $('#n-new').checked = !!s.notify.newBooking; $('#n-cancel').checked = !!s.notify.cancel; $('#n-master').checked = !!s.notify.newMaster;
+
+  $('#save').onclick = async () => {
+    const n = (id, min = 0) => Math.max(min, Number($(id).value) || 0);
+    s.schedule = $$('.sched-row[data-i]').map((r) => { const open = +$('[data-f="open"]', r).value, close = +$('[data-f="close"]', r).value; return { open, close, closed: !$('[data-f="on"]', r).checked }; });
+    if (s.schedule.some((d) => !d.closed && d.close <= d.open)) return toast('Время закрытия должно быть позже открытия', 'error');
+    s.seats = n('#seats', 1); s.prices = { hour: n('#p-hour'), day: n('#p-day'), subscription: n('#p-sub'), subscriptionHours: n('#p-subh', 1) };
+    s.contacts = { ...s.contacts, address: $('#c-address').value.trim(), phone: $('#c-phone').value.trim(), email: $('#c-email').value.trim(), mapUrl: $('#c-map').value.trim(),
+      socials: Object.fromEntries(['instagram', 'telegram', 'vk', 'tiktok'].map((k) => [k, $('#s-' + k).value.trim()])) };
+    s.emails = { confirm: $('#e-confirm').value, cancel: $('#e-cancel').value, reminder: $('#e-reminder').value };
+    s.rules = { cancelHours: n('#r-cancel'), maxDaysAhead: n('#r-days', 1), maxSlotsPerBooking: n('#r-max', 1) };
+    s.bookingOpen = $('#r-open').checked; s.notify = { newBooking: $('#n-new').checked, cancel: $('#n-cancel').checked, newMaster: $('#n-master').checked };
+    BS.busy($('#save'), true, 'Сохраняем…');
+    try { await DB.settings.save(s); toast('Настройки сохранены'); } catch (e) { toast(e.message, 'error'); }
+    BS.busy($('#save'), false);
+  };
+})();
+</script>
+</body>
+</html>

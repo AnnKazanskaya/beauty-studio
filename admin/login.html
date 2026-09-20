@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вход в админ‑панель — Beauty Studio</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/db.js"></script>
+<script src="../js/app.js"></script>
+</head>
+<body style="background:var(--bg-soft)">
+<div style="background:var(--ink);color:#fff"><div class="container" style="height:68px;display:flex;align-items:center;justify-content:space-between"><a class="logo" href="../index.html" style="color:#fff"><i></i>BEAUTY STUDIO</a><span class="badge pink">Admin</span></div></div>
+
+<div class="auth-wrap" style="min-height:calc(100vh - 68px)">
+  <div class="card auth-card">
+    <div class="eyebrow">Админ‑панель</div>
+    <h2>Вход для администратора</h2>
+    <p class="muted mb-3">Только для сотрудников студии.</p>
+    <form class="form" id="form" novalidate>
+      <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="password">Пароль</label><div class="pw-wrap"><input class="input" id="password" type="password" autocomplete="current-password" required><button type="button" class="pw-toggle"></button></div></div>
+      <div class="form-msg" id="msg"></div>
+      <button class="btn block" type="submit" id="submit">Войти в админку</button>
+    </form>
+    <p class="muted small mt-3" style="text-align:center"><a href="../index.html">‹ Вернуться на сайт</a></p>
+  </div>
+</div>
+<script>
+(async () => {
+  const { $, showMsg, busy } = BS; $('.pw-toggle').innerHTML = BS.ICON.eye; BS.pwToggles();
+  const me = await DB.auth.me().catch(() => null);
+  if (me && me.role === 'admin') { location.replace('index.html'); return; }
+  $('#form').addEventListener('submit', async (e) => {
+    e.preventDefault(); busy($('#submit'), true, 'Проверяем…');
+    try {
+      const u = await DB.auth.signIn($('#email').value, $('#password').value);
+      if (u.role !== 'admin') { await DB.auth.signOut(); throw new Error('У этого аккаунта нет прав администратора'); }
+      location.href = 'index.html';
+    } catch (err) { showMsg($('#msg'), err.message); busy($('#submit'), false); }
+  });
+})();
+</script>
+</body>
+</html>

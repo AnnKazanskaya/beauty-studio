@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Расписание — Beauty Studio Admin</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/db.js"></script>
+<script src="../js/app.js"></script>
+<script src="../js/admin.js"></script>
+</head>
+<body>
+<div class="admin-topbar" id="topbar"></div>
+<div class="admin">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="admin-main">
+    <div class="admin-head"><div><h2>Управление расписанием</h2><p class="muted">Брони, закрытие слотов и дней</p></div>
+      <div class="row" id="day-actions"></div></div>
+    <div class="two-wide">
+      <div class="grid">
+        <div class="cal" id="cal"></div>
+        <div class="grid grid-3" id="day-stats" style="gap:10px"></div>
+      </div>
+      <div class="grid">
+        <div class="slots" id="slots"></div>
+        <div class="card"><div class="row between mb-2"><h3>Брони на день</h3><span class="muted small" id="day-label"></span></div><div class="table-wrap" id="table"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+<script>
+(async () => {
+  const ctx = await ADMIN.init(); if (!ctx) return;
+  const { settings } = ctx; const { $, $$, esc, iso, parse, today, addDays, fmtDate, fmtHour, hoursToRanges, money, toast, plural, dayHours, modal, closeModal } = BS;
+  const state = { month: parse(today()), date: today(), bookings: [], closed: [], from: null };
+  state.month.setDate(1);
+  const p = new URLSearchParams(location.search); if (p.get('d')) { state.date = p.get('d'); state.month = parse(state.date); state.month.setDate(1); }
+
+  async function loadRange() {
+    const from = iso(state.month); const to = iso(new Date(state.month.getFullYear(), state.month.getMonth() + 1, 0));
+    try { [state.bookings, state.closed] = await Promise.all([DB.bookings.all({ from, to }), DB.slots.closed(from, to)]); } catch (e) { toast(e.message, 'error'); }
+  }
+  const active = () => state.bookings.filter((b) => b.status === 'active');
+  const dayClosedRec = (d) => state.closed.find((c) => c.date === d && c.hour === null && c.seat === null);
+  const closedRec = (d, h, s) => state.closed.find((c) => c.date === d && (c.hour === null || c.hour === h) && (c.seat === null || c.seat === s));
+  const bookingAt = (d, h, s) => active().find((b) => b.date === d && b.hour === h && b.seat === s);
+
+  function renderCal() {
+    const y = state.month.getFullYear(), m = state.month.getMonth();
+    const startDow = (new Date(y, m, 1).getDay() + 6) % 7; const days = new Date(y, m + 1, 0).getDate();
+    let cells = BS.DOW.map((d) => `<div class="dow">${d}</div>`).join(''); for (let i = 0; i < startDow; i++) cells += '<div></div>';
+    for (let d = 1; d <= days; d++) {
+      const ds = iso(new Date(y, m, d)); const n = active().filter((b) => b.date === ds).length; const closed = !dayHours(settings, ds).length || dayClosedRec(ds);
+      cells += `<button class="cal-day ${ds === today() ? 'today' : ''} ${ds === state.date ? 'selected' : ''} ${closed ? 'closed' : ''}" data-d="${ds}">${d}${n ? `<span class="cnt">${n}</span>` : ''}<span class="m">${n ? '<i></i>' : ''}</span></button>`;
+    }
+    $('#cal').innerHTML = `<div class="cal-head"><b>${BS.MONTHS_NOM[m]} ${y}</b><div class="cal-nav"><button id="prev">‹</button><button id="next">›</button></div></div><div class="cal-grid">${cells}</div><p class="muted small mt-2">Цифра в углу — число занятых слотов за день.</p>`;
+    $('#prev').onclick = async () => { state.month = new Date(y, m - 1, 1); await loadRange(); renderCal(); };
+    $('#next').onclick = async () => { state.month = new Date(y, m + 1, 1); await loadRange(); renderCal(); };
+    $$('.cal-day').forEach((b) => (b.onclick = () => { state.date = b.dataset.d; renderCal(); renderDay(); }));
+  }
+
+  function renderDay() {
+    const d = state.date; const hours = dayHours(settings, d); const root = $('#slots'); root.style.setProperty('--seats', settings.seats);
+    $('#day-label').textContent = fmtDate(d, true);
+    const dayClosed = dayClosedRec(d);
+    $('#day-actions').innerHTML = dayClosed ? `<span class="badge red">День закрыт${dayClosed.reason ? ': ' + esc(dayClosed.reason) : ''}</span><button class="btn light sm" id="open-day">Открыть день</button>`
+      : hours.length ? `<button class="btn danger sm" id="close-day">Закрыть весь день</button>` : '<span class="badge gray">Выходной по графику</span>';
+    const cd = $('#close-day'); if (cd) cd.onclick = async () => { if (!(await BS.confirmDlg('Закрыть весь день?', `${fmtDate(d)}: новые брони будут невозможны. Существующие брони не отменяются автоматически.`, { ok: 'Закрыть день', danger: true }))) return; try { await DB.slots.closeDay(d); toast('День закрыт'); await refresh(); } catch (e) { toast(e.message, 'error'); } };
+    const od = $('#open-day'); if (od) od.onclick = async () => { try { await DB.slots.openDay(d); toast('День открыт'); await refresh(); } catch (e) { toast(e.message, 'error'); } };
+
+    let busy = 0, closedN = 0, free = 0;
+    let grid = `<div class="slots-head"><b>${fmtDate(d, true)}</b><div class="legend"><span><i class="free"></i> свободно</span><span><i class="busy"></i> занято</span><span><i class="closed"></i> закрыто</span></div></div>`;
+    if (!hours.length) grid += '<div class="empty"><b>Выходной</b>По графику студия не работает.</div>';
+    else {
+      grid += `<div class="slot-table"><div class="th"></div>`; for (let s = 1; s <= settings.seats; s++) grid += `<div class="th">Место ${s}</div>`;
+      hours.forEach((h) => { grid += `<div class="time">${fmtHour(h)}</div>`;
+        for (let s = 1; s <= settings.seats; s++) { const b = bookingAt(d, h, s); const c = closedRec(d, h, s);
+          if (b) { busy++; grid += `<button class="slot busy" data-h="${h}" data-s="${s}" style="cursor:pointer"><span class="nm">${esc(b.profile?.name || 'Мастер')}</span></button>`; }
+          else if (c) { closedN++; grid += `<button class="slot closed" data-h="${h}" data-s="${s}" style="cursor:pointer">закрыто</button>`; }
+          else { free++; grid += `<button class="slot" data-h="${h}" data-s="${s}">свободно</button>`; } } });
+      grid += '</div><p class="muted small mt-2">Нажмите на слот, чтобы открыть меню действий.</p>';
+    }
+    root.innerHTML = grid;
+    $('#day-stats').innerHTML = `<div class="card metric" style="padding:14px"><div class="k">Занято</div><div class="num" style="font-size:26px">${busy}</div></div><div class="card metric" style="padding:14px"><div class="k">Закрыто</div><div class="num" style="font-size:26px">${closedN}</div></div><div class="card metric" style="padding:14px"><div class="k">Свободно</div><div class="num" style="font-size:26px">${free}</div></div>`;
+    $$('.slot', root).forEach((el) => (el.onclick = () => slotMenu(+el.dataset.h, +el.dataset.s)));
+
+    const groups = ADMIN.groupBookings(state.bookings.filter((b) => b.date === d)).sort((a, b) => a.items[0].hour - b.items[0].hour);
+    $('#table').innerHTML = groups.length ? `<table><thead><tr><th>Время</th><th>Место</th><th>Мастер</th><th>Сумма</th><th>Статус</th><th></th></tr></thead><tbody>${groups.map((g) => `<tr>
+      <td><b>${hoursToRanges(g.items.map((i) => i.hour))}</b></td><td>№${g.seat}</td><td><b>${esc(g.profile?.name || '—')}</b><br><span class="muted small">${esc(g.profile?.phone || '')}</span></td><td>${money(g.sum)}</td>
+      <td>${g.status === 'active' ? '<span class="badge green">Активна</span>' : '<span class="badge red">Отменена</span>'}</td>
+      <td>${g.status === 'active' ? `<button class="btn light sm" data-cancel="${g.ids.join(',')}">Отменить</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">Броней на этот день нет</div>';
+    $$('[data-cancel]').forEach((b) => (b.onclick = () => cancelIds(b.dataset.cancel.split(','))));
+  }
+
+  async function cancelIds(ids) {
+    if (!(await BS.confirmDlg('Отменить бронь мастера?', `Будет отменено ${plural(ids.length, 'слот', 'слота', 'слотов')}. Мастеру стоит сообщить об этом.`, { ok: 'Отменить бронь', danger: true }))) return;
+    try { for (const id of ids) await DB.bookings.adminCancel(id); toast('Бронь отменена'); await refresh(); } catch (e) { toast(e.message, 'error'); }
+  }
+  function slotMenu(h, s) {
+    const d = state.date; const b = bookingAt(d, h, s); const c = closedRec(d, h, s);
+    const title = `${fmtDate(d)}, ${fmtHour(h)}, место ${s}`;
+    let body = '', actions = '';
+    if (b) { body = `<p class="mt-2"><b>${esc(b.profile?.name || 'Мастер')}</b><br><span class="muted small">${esc(b.profile?.phone || '')} · ${esc(b.profile?.email || '')}</span></p><p class="muted small mt-1">Бронь создана ${BS.rel(b.created_at)} · ${money(b.price || 0)}</p>`;
+      actions = `<button class="btn danger" id="act-cancel">Отменить этот час</button>`; }
+    else if (c) { body = `<p class="mt-2">Слот закрыт${c.reason ? ': ' + esc(c.reason) : ''}${c.hour === null ? ' (закрыт весь день)' : c.seat === null ? ' (закрыт час на всех местах)' : ''}.</p>`;
+      actions = `<button class="btn" id="act-open">Открыть слот</button>`; }
+    else { body = `<p class="mt-2">Слот свободен.</p><div class="field mt-2"><label>Причина закрытия (необязательно)</label><input class="input" id="reason" placeholder="Например: уборка, ремонт кресла"></div>`;
+      actions = `<button class="btn" id="act-close">Закрыть слот</button><button class="btn light" id="act-close-all">Закрыть час на всех местах</button>`; }
+    modal(`<h3>${title}</h3>${body}<div class="actions">${actions}<button class="btn light" data-close>Закрыть окно</button></div>`, { onOpen: (m) => {
+      const q = (id) => $(id, m);
+      if (q('#act-cancel')) q('#act-cancel').onclick = () => { closeModal(); cancelIds([b.id]); };
+      if (q('#act-open')) q('#act-open').onclick = async () => { try { await DB.slots.open(c.id); closeModal(); toast('Слот открыт'); await refresh(); } catch (e) { toast(e.message, 'error'); } };
+      if (q('#act-close')) q('#act-close').onclick = async () => { try { await DB.slots.close({ date: d, hour: h, seat: s, reason: q('#reason').value.trim() }); closeModal(); toast('Слот закрыт'); await refresh(); } catch (e) { toast(e.message, 'error'); } };
+      if (q('#act-close-all')) q('#act-close-all').onclick = async () => { try { await DB.slots.close({ date: d, hour: h, seat: null, reason: q('#reason').value.trim() }); closeModal(); toast('Час закрыт на всех местах'); await refresh(); } catch (e) { toast(e.message, 'error'); } };
+    } });
+  }
+  async function refresh() { await loadRange(); renderCal(); renderDay(); }
+  await refresh();
+})();
+</script>
+</body>
+</html>

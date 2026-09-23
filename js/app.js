@@ -118,7 +118,7 @@ window.BS = (function () {
            <a href="account.html">Мои записи</a><a href="profile.html">Мой профиль</a>${user.role === 'admin' ? '<a href="admin/index.html">Админ‑панель</a>' : ''}<div class="sep"></div><button class="danger" id="logout-btn">Выйти</button></div></div>`
       : `<a class="link" href="login.html">Войти</a><a class="btn sm" href="register.html">Регистрация</a>`;
     h.className = 'header';
-    h.innerHTML = `<div class="container"><a class="logo" href="index.html"><i></i>BEAUTY STUDIO</a><nav class="nav">${nav}</nav>
+    h.innerHTML = `<div class="container"><a class="logo" href="index.html"><i></i>INBEAUTY</a><nav class="nav">${nav}</nav>
       <div class="header-right">${right}<button class="burger" aria-label="Меню"><span></span><span></span><span></span></button></div></div>
       <div class="mobile-nav" id="mobile-nav">${nav}${user ? '<a href="profile.html">Мой профиль</a>' : '<a href="login.html">Войти</a>'}</div>`;
     $('.burger', h).onclick = () => $('#mobile-nav').classList.toggle('open');
@@ -132,14 +132,14 @@ window.BS = (function () {
   function renderSimpleHeader() {
     const h = $('#site-header'); if (!h) return;
     h.className = 'header simple';
-    h.innerHTML = `<div class="container"><a class="logo" href="index.html"><i></i>BEAUTY STUDIO</a><a class="back" href="index.html">‹ На главную</a></div>`;
+    h.innerHTML = `<div class="container"><a class="logo" href="index.html"><i></i>INBEAUTY</a><a class="back" href="index.html">‹ На главную</a></div>`;
   }
   function renderFooter(settings) {
     const f = $('#site-footer'); if (!f) return; const c = settings.contacts;
     f.className = 'footer';
-    f.innerHTML = `<div class="container"><div><b style="color:var(--ink)">BEAUTY STUDIO</b> · ${esc(c.address)}</div>
+    f.innerHTML = `<div class="container"><div><b style="color:var(--ink)">INBEAUTY</b> · ${esc(c.address)}</div>
       <div class="links"><a href="prices.html">Цены</a><a href="contacts.html">Контакты</a><a href="login.html">Вход</a><a href="admin/login.html">Админ</a></div>
-      <div>© ${new Date().getFullYear()} Beauty Studio</div></div>`;
+      <div>© ${new Date().getFullYear()} InBeauty</div></div>`;
   }
 
   async function init({ auth = false, redirectIfAuthed = false, simple = false } = {}) {

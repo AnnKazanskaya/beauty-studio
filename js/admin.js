@@ -9,12 +9,12 @@ window.ADMIN = (function () {
     if (!user || user.role !== 'admin') { location.replace('login.html'); return null; }
     const cur = BS.page();
     const links = NAV.map(([h, t, i]) => `<a href="${h}" class="nav-item ${cur === h ? 'active' : ''}"><span class="ic">${i}</span>${t}</a>`).join('');
-    $('#sidebar').innerHTML = `<div class="brand"><a class="logo" href="../index.html"><i></i><span>BEAUTY<br>STUDIO</span></a><span class="badge tag">Admin</span></div>${links}
+    $('#sidebar').innerHTML = `<div class="brand"><a class="logo" href="../index.html"><i></i><span>INBEAUTY</span></a><span class="badge tag">Admin</span></div>${links}
       <div class="spacer"></div><a href="../index.html" class="nav-item"><span class="ic">‹</span>На сайт</a>
       <div class="who"><span class="avatar sm">${esc((user.name || 'A')[0].toUpperCase())}</span><div class="meta"><b>${esc(user.name || 'Администратор')}</b><span>${esc(user.email)}</span></div><button id="adm-logout" title="Выйти" aria-label="Выйти">⏻</button></div>`;
     $('#adm-logout').onclick = async () => { await DB.auth.signOut(); location.href = '../index.html'; };
     const tb = $('#topbar');
-    if (tb) { tb.innerHTML = `<span class="logo" style="color:#fff;font-size:16px"><i></i>BEAUTY STUDIO <span class="badge tag" style="margin-left:8px">Admin</span></span><button class="burger" id="sb-toggle" aria-label="Меню"><span></span><span></span><span></span></button>`;
+    if (tb) { tb.innerHTML = `<span class="logo" style="color:#fff;font-size:16px"><i></i>INBEAUTY <span class="badge tag" style="margin-left:8px">Admin</span></span><button class="burger" id="sb-toggle" aria-label="Меню"><span></span><span></span><span></span></button>`;
       $('#sb-toggle').onclick = () => $('#sidebar').classList.toggle('open'); }
     return { user, settings };
   }

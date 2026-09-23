@@ -1,8 +1,8 @@
-/* Слой данных Beauty Studio: Supabase (аккаунты, брони, настройки, админка) */
+/* Слой данных InBeauty: Supabase (аккаунты, брони, настройки, админка) */
 (function () {
   const cfg = window.BS_CONFIG || {};
   if (!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase)) {
-    console.error('Beauty Studio: не заданы ключи Supabase в js/config.js');
+    console.error('InBeauty: не заданы ключи Supabase в js/config.js');
   }
 
   const DEFAULT_SETTINGS = {
@@ -12,18 +12,18 @@
     rules: { cancelHours: 12, maxDaysAhead: 30, maxSlotsPerBooking: 20 },
     bookingOpen: true,
     contacts: {
-      name: 'Beauty Studio',
+      name: 'InBeauty',
       address: 'г. Пермь, ул. Тихоокеанская, 38',
       addressNote: '5 минут от метро • парковка во дворе',
       phone: '+7 (900) 000-00-00',
-      email: 'hello@beautystudio.ru',
+      email: 'hello@inbeauty.ru',
       mapUrl: 'https://yandex.ru/maps/?text=Пермь,%20ул.%20Тихоокеанская,%2038',
       socials: { instagram: '', telegram: '', vk: '', tiktok: '' },
     },
     emails: {
-      confirm: 'Здравствуйте, {name}! Ваша бронь подтверждена: {date}, {time}, место «{seat}». Оплата на месте. До встречи в Beauty Studio!',
+      confirm: 'Здравствуйте, {name}! Ваша бронь подтверждена: {date}, {time}, место «{seat}». Оплата на месте. До встречи в InBeauty!',
       cancel: 'Здравствуйте, {name}. Бронь на {date}, {time}, место «{seat}» отменена.',
-      reminder: 'Напоминаем: завтра в {time} вас ждёт рабочее место «{seat}» в Beauty Studio. Адрес: {address}.',
+      reminder: 'Напоминаем: завтра в {time} вас ждёт рабочее место «{seat}» в InBeauty. Адрес: {address}.',
     },
     notify: { newBooking: true, cancel: true, newMaster: true },
   };
